@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+/.vs/swe_dev/v17
+/.vs
+/source/.vs/olcSoundWaveEngine/v17
+/source/x64/Debug

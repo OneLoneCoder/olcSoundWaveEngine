@@ -16,6 +16,15 @@ namespace olc::sound
 		Wave_generic(std::istream& sStream) { LoadAudioWaveform(sStream); }
 		Wave_generic(const char* pData, const size_t nBytes) { LoadAudioWaveform(pData, nBytes); }
 
+		Wave_generic(const size_t nChannels, const size_t nSampleSize, const size_t nSampleRate, const size_t nSamples)
+		{
+			vChannelView.clear();
+			file = wave::File<T>(nChannels, nSampleSize, nSampleRate, nSamples);
+			vChannelView.resize(file.channels());
+			for (uint32_t c = 0; c < file.channels(); c++)
+				vChannelView[c].SetData(file.data(), file.samples(), file.channels(), c);
+		}
+
 		bool LoadAudioWaveform(std::string sWavFile)
 		{
 			vChannelView.clear();

@@ -57,6 +57,12 @@
     <ClInclude Include="olcSoundWaveEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="swe_synth_osc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swe_synth_envelope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="swe_system_base.cpp">
@@ -90,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="swe_test_basics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_osc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_envelope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

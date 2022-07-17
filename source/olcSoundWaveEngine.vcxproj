@@ -95,11 +95,19 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -118,11 +126,19 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -137,11 +153,19 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,17 +184,27 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="olcSoundWaveEngine.h" />
     <ClInclude Include="olc_swe_template.h" />
     <ClInclude Include="swe_dummy.h" />
     <ClInclude Include="swe_prefix.h" />
+    <ClInclude Include="swe_synth_envelope.h" />
+    <ClInclude Include="swe_synth_osc.h" />
     <ClInclude Include="swe_wave_engine.h" />
     <ClInclude Include="swe_system_alsa.h" />
     <ClInclude Include="swe_system_base.h" />
@@ -183,6 +217,8 @@
     <ClInclude Include="swe_wave_wave.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="swe_synth_envelope.cpp" />
+    <ClCompile Include="swe_synth_osc.cpp" />
     <ClCompile Include="swe_test_basics.cpp" />
     <ClCompile Include="swe_wave_engine.cpp" />
     <ClCompile Include="swe_system_alsa.cpp" />

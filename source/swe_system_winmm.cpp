@@ -42,7 +42,7 @@ namespace olc::sound::driver
 		// My std::vector's content will change, but their size never will - they are basically array now
 		m_pvBlockMemory = std::make_unique<std::vector<short>[]>(m_pHost->GetBlocks());
 		for (size_t i = 0; i < m_pHost->GetBlocks(); i++)
-			m_pvBlockMemory[i].resize(m_pHost->GetBlockSampleCount(), 0);
+			m_pvBlockMemory[i].resize(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0);
 
 		// Link headers to block memory - clever, so we only move headers about
 		// rather than memory...
@@ -109,7 +109,7 @@ namespace olc::sound::driver
 	{
 		// We will be using this vector to transfer to the host for filling, with 
 		// user sound data (float32, -1.0 --> +1.0)
-		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount(), 0.0f);
+		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0.0f);
 
 		// While the system is active, start requesting audio data
 		while (m_bDriverLoopActive)

@@ -12,6 +12,19 @@ namespace olc::sound::wave
 	class File
 	{
 	public:
+		File() = default;
+
+		File(const size_t nChannels, const size_t nSampleSize, const size_t nSampleRate, const size_t nSamples)
+		{
+			m_nChannels = nChannels;
+			m_nSampleSize = nSampleSize;
+			m_nSamples = nSamples;
+			m_nSampleRate = nSampleRate;
+
+			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
+		}
+
+	public:
 		T* data() const
 		{
 			return m_pRawData.get();
@@ -128,6 +141,11 @@ namespace olc::sound::wave
 				}
 			}
 			return true;
+		}
+
+		bool SaveFile(const std::string& sFilename)
+		{
+			return false;
 		}
 
 

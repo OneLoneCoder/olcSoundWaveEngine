@@ -118,6 +118,19 @@ namespace olc::sound
 	class File
 	{
 	public:
+		File() = default;
+
+		File(const size_t nChannels, const size_t nSampleSize, const size_t nSampleRate, const size_t nSamples)
+		{
+			m_nChannels = nChannels;
+			m_nSampleSize = nSampleSize;
+			m_nSamples = nSamples;
+			m_nSampleRate = nSampleRate;
+
+			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
+		}
+
+	public:
 		T* data() const
 		{
 			return m_pRawData.get();
@@ -236,6 +249,11 @@ namespace olc::sound
 			return true;
 		}
 
+		bool SaveFile(const std::string& sFilename)
+		{
+			return false;
+		}
+
 
 	protected:
 		std::unique_ptr<T[]> m_pRawData;
@@ -331,6 +349,15 @@ namespace olc::sound
 		Wave_generic(std::string sWavFile) { LoadAudioWaveform(sWavFile); }
 		Wave_generic(std::istream& sStream) { LoadAudioWaveform(sStream); }
 		Wave_generic(const char* pData, const size_t nBytes) { LoadAudioWaveform(pData, nBytes); }
+
+		Wave_generic(const size_t nChannels, const size_t nSampleSize, const size_t nSampleRate, const size_t nSamples)
+		{
+			vChannelView.clear();
+			file = wave::File<T>(nChannels, nSampleSize, nSampleRate, nSamples);
+			vChannelView.resize(file.channels());
+			for (uint32_t c = 0; c < file.channels(); c++)
+				vChannelView[c].SetData(file.data(), file.samples(), file.channels(), c);
+		}
 
 		bool LoadAudioWaveform(std::string sWavFile)
 		{
@@ -858,7 +885,7 @@ namespace olc::sound::driver
 		// My std::vector's content will change, but their size never will - they are basically array now
 		m_pvBlockMemory = std::make_unique<std::vector<short>[]>(m_pHost->GetBlocks());
 		for (size_t i = 0; i < m_pHost->GetBlocks(); i++)
-			m_pvBlockMemory[i].resize(m_pHost->GetBlockSampleCount(), 0);
+			m_pvBlockMemory[i].resize(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0);
 
 		// Link headers to block memory - clever, so we only move headers about
 		// rather than memory...
@@ -925,7 +952,7 @@ namespace olc::sound::driver
 	{
 		// We will be using this vector to transfer to the host for filling, with 
 		// user sound data (float32, -1.0 --> +1.0)
-		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount(), 0.0f);
+		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0.0f);
 
 		// While the system is active, start requesting audio data
 		while (m_bDriverLoopActive)

@@ -204,6 +204,7 @@
     <ClInclude Include="swe_dummy.h" />
     <ClInclude Include="swe_prefix.h" />
     <ClInclude Include="swe_synth_envelope.h" />
+    <ClInclude Include="swe_synth_modular.h" />
     <ClInclude Include="swe_synth_osc.h" />
     <ClInclude Include="swe_wave_engine.h" />
     <ClInclude Include="swe_system_alsa.h" />
@@ -218,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="swe_synth_envelope.cpp" />
+    <ClCompile Include="swe_synth_modular.cpp" />
     <ClCompile Include="swe_synth_osc.cpp" />
     <ClCompile Include="swe_test_basics.cpp" />
     <ClCompile Include="swe_wave_engine.cpp" />

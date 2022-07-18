@@ -6,8 +6,10 @@ olc::sound::WaveEngine engine;
 
 int main()
 {
-	engine.InitialiseAudio(44100, 2);
+	engine.InitialiseAudio();
 	olc::sound::Wave w("./assets/SampleA.wav");
+	
+
 	w.file.data()[23] = 8;
 
 

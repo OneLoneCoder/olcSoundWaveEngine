@@ -59,6 +59,7 @@ namespace olc::sound
 		void UseInputDevice(const std::string& sDeviceOut);
 
 
+		void SetCallBack_NewSample(std::function<void(double)> func);
 		void SetCallBack_SynthFunction(std::function<float(uint32_t, double)> func);
 		void SetCallBack_FilterFunction(std::function<float(uint32_t, double, float)> func);
 
@@ -76,6 +77,7 @@ namespace olc::sound
 
 	private:
 		std::unique_ptr<driver::Base> m_driver;
+		std::function<void(double)> m_funcNewSample;
 		std::function<float(uint32_t, double)> m_funcUserSynth;
 		std::function<float(uint32_t, double, float)> m_funcUserFilter;
 

@@ -432,6 +432,7 @@ namespace olc::sound
 		void UseInputDevice(const std::string& sDeviceOut);
 
 
+		void SetCallBack_NewSample(std::function<void(double)> func);
 		void SetCallBack_SynthFunction(std::function<float(uint32_t, double)> func);
 		void SetCallBack_FilterFunction(std::function<float(uint32_t, double, float)> func);
 
@@ -449,6 +450,7 @@ namespace olc::sound
 
 	private:
 		std::unique_ptr<driver::Base> m_driver;
+		std::function<void(double)> m_funcNewSample;
 		std::function<float(uint32_t, double)> m_funcUserSynth;
 		std::function<float(uint32_t, double, float)> m_funcUserFilter;
 
@@ -516,6 +518,83 @@ namespace olc::sound
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
+	}
+
+
+	namespace synth
+	{
+		class Property
+		{
+		public:
+			double value = 0.0f;
+
+		public:
+			Property() = default;
+			Property(double f);
+
+		public:
+			Property& operator =(const double f);			
+		};
+
+
+		class Trigger
+		{
+
+		};
+
+
+		class Module
+		{
+		public:
+			virtual void Update(uint32_t nChannel, double dTime, double dTimeStep) = 0;
+		};
+
+
+		class ModularSynth
+		{
+		public:
+			ModularSynth();
+
+		public:
+			bool AddModule(Module* pModule);
+			bool RemoveModule(Module* pModule);
+			bool AddPatch(Property* pInput, Property* pOutput);
+			bool RemovePatch(Property* pInput, Property* pOutput);
+
+
+		public:
+			void UpdatePatches();
+			void Update(uint32_t nChannel, double dTime, double dTimeStep);
+
+		protected:
+			std::vector<Module*> m_vModules;
+			std::vector<std::pair<Property*, Property*>> m_vPatches;
+		};
+
+
+	namespace modules
+	{
+		class Oscillator : public Module
+		{
+		public:
+			// Primary frequency of oscillation
+			Property frequency = 0.0f;
+			// Primary amplitude of output
+			Property amplitude = 1.0f;
+			// LFO input if required
+			Property lfo_input = 0.0f;
+			// Primary Output
+			Property output;
+
+		private:
+			double phase_acc = 0.0f;
+			double max_frequency = 20000.0;
+
+		public:
+			void Update(uint32_t nChannel, double dTime, double dTimeStep) override;
+
+		};
+	}
 	}
 
 
@@ -596,7 +675,7 @@ namespace olc::sound
 
 	WaveEngine::~WaveEngine()
 	{
-
+		DestroyAudio();
 	}
 
 	std::vector<std::string> WaveEngine::GetOutputDevices()
@@ -642,6 +721,10 @@ namespace olc::sound
 		return false;
 	}
 
+	void WaveEngine::SetCallBack_NewSample(std::function<void(double)> func)
+	{
+		m_funcNewSample = func;
+	}
 
 	void WaveEngine::SetCallBack_SynthFunction(std::function<float(uint32_t, double)> func)
 	{
@@ -688,6 +771,9 @@ namespace olc::sound
 		for (uint32_t nSample = 0; nSample < nRequiredSamples; nSample++)
 		{
 			double dSampleTime = m_dGlobalTime + nSample * m_dTimePerSample;
+
+			if (m_funcNewSample)
+				m_funcNewSample(dSampleTime);
 
 			for (uint32_t nChannel = 0; nChannel < m_nChannels; nChannel++)
 			{
@@ -845,7 +931,118 @@ namespace olc::sound
 		}
 	}
 	}	
+
+	namespace synth
+	{
+	Property::Property(double f)
+	{
+		value = std::clamp(f, -1.0, 1.0);
+	}
+
+	Property& Property::operator =(const double f)
+	{
+		value = std::clamp(f, -1.0, 1.0);
+		return *this;
+	}
+
+
+	ModularSynth::ModularSynth()
+	{
+
+	}
+
+	bool ModularSynth::AddModule(Module* pModule)
+	{
+		// Check if module already added
+		if (std::find(m_vModules.begin(), m_vModules.end(), pModule) == std::end(m_vModules))
+		{
+			m_vModules.push_back(pModule);
+			return true;
+		}
+
+		return false;
+	}
+
+	bool ModularSynth::RemoveModule(Module* pModule)
+	{
+		if (std::find(m_vModules.begin(), m_vModules.end(), pModule) == std::end(m_vModules))
+		{
+			m_vModules.erase(std::remove(m_vModules.begin(), m_vModules.end(), pModule), m_vModules.end());
+			return true;
+		}
+
+		return false;
+	}
+
+	bool ModularSynth::AddPatch(Property* pInput, Property* pOutput)
+	{
+		// Does patch exist?
+		std::pair<Property*, Property*> newPatch = std::pair<Property*, Property*>(pInput, pOutput);
+
+		if (std::find(m_vPatches.begin(), m_vPatches.end(), newPatch) == std::end(m_vPatches))
+		{
+			// Patch doesnt exist, now check if either are null
+			if (pInput != nullptr && pOutput != nullptr)
+			{
+				m_vPatches.push_back(newPatch);
+				return true;
+			}
+		}
+
+		return false;		
+	}
+
+	bool ModularSynth::RemovePatch(Property* pInput, Property* pOutput)
+	{
+		std::pair<Property*, Property*> newPatch = std::pair<Property*, Property*>(pInput, pOutput);
+
+		if (std::find(m_vPatches.begin(), m_vPatches.end(), newPatch) == std::end(m_vPatches))
+		{
+			m_vPatches.erase(std::remove(m_vPatches.begin(), m_vPatches.end(), newPatch), m_vPatches.end());
+			return true;
+		}
+
+		return false;
+	}
+
+	void ModularSynth::UpdatePatches()
+	{
+		// Update patches
+		for (auto& patch : m_vPatches)
+		{
+			patch.second->value = patch.first->value;
+		}
+	}
+
+
+	void ModularSynth::Update(uint32_t nChannel, double dTime, double dTimeStep)
+	{
+		// Now update synth
+		for (auto& pModule : m_vModules)
+		{
+			pModule->Update(nChannel, dTime, dTimeStep);
+		}
+	}
+
+
+	namespace modules
+	{		
+		void Oscillator::Update(uint32_t nChannel, double dTime, double dTimeStep)
+		{
+			// We use phase accumulation to combat change in parameter glitches
+			double w = frequency.value * max_frequency * 2.0 * 3.14159 * dTimeStep;
+			phase_acc += w + lfo_input.value * frequency.value;
+			if (phase_acc >= 2.0 * 3.14159) phase_acc -= 2.0 * 3.14159;
+
+
+			
+			output = amplitude.value * sin(phase_acc);
+		}
+	}
+	}
 }
+
+
 
 #if defined(SOUNDWAVE_USING_WINMM)
 // WinMM Driver Implementation

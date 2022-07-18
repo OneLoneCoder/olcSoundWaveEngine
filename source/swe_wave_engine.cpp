@@ -35,7 +35,7 @@ namespace olc::sound
 
 	WaveEngine::~WaveEngine()
 	{
-
+		DestroyAudio();
 	}
 
 	std::vector<std::string> WaveEngine::GetOutputDevices()
@@ -81,6 +81,10 @@ namespace olc::sound
 		return false;
 	}
 
+	void WaveEngine::SetCallBack_NewSample(std::function<void(double)> func)
+	{
+		m_funcNewSample = func;
+	}
 
 	void WaveEngine::SetCallBack_SynthFunction(std::function<float(uint32_t, double)> func)
 	{
@@ -127,6 +131,9 @@ namespace olc::sound
 		for (uint32_t nSample = 0; nSample < nRequiredSamples; nSample++)
 		{
 			double dSampleTime = m_dGlobalTime + nSample * m_dTimePerSample;
+
+			if (m_funcNewSample)
+				m_funcNewSample(dSampleTime);
 
 			for (uint32_t nChannel = 0; nChannel < m_nChannels; nChannel++)
 			{

@@ -118,6 +118,14 @@ namespace olc::sound
 	}
 
 
+	namespace synth
+	{
+		///[OLC_HM] INSERT swe_synth_modular.h SYNTH_MODULAR_H
+
+		///[OLC_HM] INSERT swe_synth_osc.h SYNTH_OSCILLATOR_H
+	}
+
+
 }
 
 ///[OLC_HM] INSERT swe_system_winmm.h WINMM_H
@@ -134,7 +142,16 @@ namespace olc::sound
 	{
 		///[OLC_HM] INSERT swe_system_base.cpp SYSTEM_BASE_CPP
 	}	
+
+	namespace synth
+	{
+		///[OLC_HM] INSERT swe_synth_modular.cpp SYNTH_MODULAR_CPP
+
+		///[OLC_HM] INSERT swe_synth_osc.cpp SYNTH_OSCILLATOR_CPP
+	}
 }
+
+
 
 ///[OLC_HM] INSERT swe_system_winmm.cpp WINMM_CPP
 

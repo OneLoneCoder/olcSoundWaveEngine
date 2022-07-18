@@ -15,7 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test1_BasicCompilation.cpp">
+    <ClCompile Include="Test_001_BasicCompilation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test_002_PGE_BasicSynth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

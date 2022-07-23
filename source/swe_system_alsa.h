@@ -7,6 +7,56 @@
 
 namespace olc::sound::driver
 {
+	// Not thread-safe
+	template<typename T>
+	class RingBuffer
+	{
+	public:
+		RingBuffer(unsigned int bufnum, unsigned int buflen): m_vBuffers(bufnum)
+		{
+			for (auto &vBuffer : m_vBuffers)
+				vBuffer.resize(buflen);
+		}
+
+		std::vector<T>& GetFreeBuffer()
+		{
+			assert(!IsFull());
+
+			std::vector<T>& result = m_vBuffers[m_nTail];
+			m_nTail = Next(m_nTail);
+			return result;
+		}
+
+		std::vector<T>& GetFullBuffer()
+		{
+			assert(!IsEmpty());
+
+			std::vector<T>& result = m_vBuffers[m_nHead];
+			m_nHead = Next(m_nHead);
+			return result;
+		}
+
+		bool IsEmpty()
+		{
+			return m_nHead == m_nTail;
+		}
+
+		bool IsFull()
+		{
+			return m_nHead == Next(m_nTail);
+		}
+
+	private:
+		unsigned int Next(unsigned int current)
+		{
+			return (current + 1) % m_vBuffers.size();
+		}
+
+		std::vector<std::vector<T>> m_vBuffers;
+		unsigned int m_nHead = 0;
+		unsigned int m_nTail = 0;
+	};
+
 	class ALSA : public Base
 	{
 	public:
@@ -23,7 +73,7 @@ namespace olc::sound::driver
 		void DriverLoop();
 
 		snd_pcm_t *m_pPCM;
-		std::unique_ptr<float[]> m_pBlockMemory;
+		RingBuffer<float> m_rBuffers;
 		std::atomic<bool> m_bDriverLoopActive{ false };
 		std::thread m_thDriverLoop;
 	};

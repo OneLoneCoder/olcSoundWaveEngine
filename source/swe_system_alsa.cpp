@@ -8,7 +8,7 @@
 // ALSA Driver Implementation
 namespace olc::sound::driver
 {
-	ALSA::ALSA(WaveEngine* pHost) : Base(pHost)
+	ALSA::ALSA(WaveEngine* pHost) : Base(pHost), m_rBuffers(pHost->GetBlocks(), pHost->GetBlockSampleCount())
 	{ }
 
 	ALSA::~ALSA()
@@ -20,7 +20,7 @@ namespace olc::sound::driver
 	bool ALSA::Open(const std::string& sOutputDevice, const std::string& sInputDevice)
 	{
 		// Open PCM stream
-		int rc = snd_pcm_open(&m_pPCM, "default", SND_PCM_STREAM_PLAYBACK, 0);
+		int rc = snd_pcm_open(&m_pPCM, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
 		if (rc < 0)
 			return false;
 
@@ -34,7 +34,7 @@ namespace olc::sound::driver
 		snd_pcm_hw_params_set_format(m_pPCM, params, SND_PCM_FORMAT_FLOAT);
 		snd_pcm_hw_params_set_rate(m_pPCM, params, m_pHost->GetSampleRate(), 0);
 		snd_pcm_hw_params_set_channels(m_pPCM, params, m_pHost->GetChannels());
-		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount(), 0);
+		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount() / m_pHost->GetChannels(), 0);
 		snd_pcm_hw_params_set_periods(m_pPCM, params, m_pHost->GetBlocks(), 0);
 
 		// Save these parameters
@@ -51,7 +51,7 @@ namespace olc::sound::driver
 		std::vector<float> vSilence(m_pHost->GetBlockSampleCount(), 0.0f);
 		snd_pcm_start(m_pPCM);
 		for (unsigned int i = 0; i < m_pHost->GetBlocks(); i++)
-			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount());
+			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount() / m_pHost->GetChannels());
 
 		snd_pcm_start(m_pPCM);
 		m_bDriverLoopActive = true;
@@ -68,6 +68,8 @@ namespace olc::sound::driver
 		// Wait for driver thread to exit gracefully
 		if (m_thDriverLoop.joinable())
 			m_thDriverLoop.join();
+
+		snd_pcm_drop(m_pPCM);
 	}
 
 	void ALSA::Close()
@@ -81,16 +83,34 @@ namespace olc::sound::driver
 
 	void ALSA::DriverLoop()
 	{
-		// We will be using this vector to transfer to the host for filling, with
-		// user sound data (float32, -1.0 --> +1.0)
-		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount(), 0.0f);
+		const uint32_t nFrames = m_pHost->GetBlockSampleCount() / m_pHost->GetChannels();
 
 		// While the system is active, start requesting audio data
 		while (m_bDriverLoopActive)
 		{
-			// Grab audio data from user
-			GetFullOutputBlock(vFloatBuffer);
-			snd_pcm_writei(m_pPCM, vFloatBuffer.data(), m_pHost->GetBlockSampleCount());
+			if (!m_rBuffers.IsFull())
+			{
+				// Grab some audio data
+				auto& vFreeBuffer = m_rBuffers.GetFreeBuffer();
+				GetFullOutputBlock(vFreeBuffer);
+			}
+
+			// Check if we can write more data
+			auto avail = snd_pcm_avail_update(m_pPCM);
+			while (!m_rBuffers.IsEmpty() && avail >= nFrames)
+			{
+				auto vFullBuffer = m_rBuffers.GetFullBuffer();
+				uint32_t nWritten = 0;
+
+				while (nWritten < nFrames)
+				{
+					auto ret = snd_pcm_writei(m_pPCM, vFullBuffer.data() + nWritten, nFrames - nWritten);
+					if (ret > 0)
+						nWritten += ret;
+					else break; // TODO Skipping error handling is gigaunpog
+				}
+				avail = snd_pcm_avail_update(m_pPCM);
+			}
 		}
 	}
 } // ALSA Driver Implementation

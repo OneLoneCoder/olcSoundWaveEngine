@@ -177,6 +177,8 @@ namespace olc::sound
 
 ///[OLC_HM] INSERT swe_system_alsa.h ALSA_H
 
+///[OLC_HM] INSERT swe_system_pulse.h PULSE_H
+
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
 
@@ -202,6 +204,7 @@ namespace olc::sound
 ///[OLC_HM] INSERT swe_system_winmm.cpp WINMM_CPP
 ///[OLC_HM] INSERT swe_system_sdlmixer.cpp SDLMIXER_CPP
 ///[OLC_HM] INSERT swe_system_alsa.cpp ALSA_CPP
+///[OLC_HM] INSERT swe_system_pulse.cpp PULSE_CPP
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

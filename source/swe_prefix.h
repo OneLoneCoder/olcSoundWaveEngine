@@ -1,11 +1,15 @@
 #pragma once
 
 ///[OLC_HM] START STD_INCLUDES
+#include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <vector>
 #include <list>
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 #include <functional>
 #include <string>
 #include <algorithm>

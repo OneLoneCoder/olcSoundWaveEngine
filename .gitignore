@@ -34,4 +34,6 @@
 /.vs
 /source/.vs/olcSoundWaveEngine/v17
 /source/x64/Debug
+
+olcSoundWaveEngine.h
 /source/.vs/olcSoundWaveEngine

@@ -95,6 +95,29 @@ namespace olc::sound::driver
 	{
 		const uint32_t nFrames = m_pHost->GetBlockSampleCount() / m_pHost->GetChannels();
 
+		int err;
+		std::vector<pollfd> vFDs;
+
+		int nFDs = snd_pcm_poll_descriptors_count(m_pPCM);
+		if (nFDs < 0)
+		{
+			std::cerr << "snd_pcm_poll_descriptors_count returned " << nFDs << "\n";
+			std::cerr << "disabling polling\n";
+			nFDs = 0;
+		}
+		else
+		{
+			vFDs.resize(nFDs);
+
+			err = snd_pcm_poll_descriptors(m_pPCM, vFDs.data(), vFDs.size());
+			if (err < 0)
+			{
+				std::cerr << "snd_pcm_poll_descriptors returned " << err << "\n";
+				std::cerr << "disabling polling\n";
+				vFDs = {};
+			}
+		}
+
 		// While the system is active, start requesting audio data
 		while (m_bDriverLoopActive)
 		{
@@ -105,8 +128,28 @@ namespace olc::sound::driver
 				GetFullOutputBlock(vFreeBuffer);
 			}
 
-			// Check if we can write more data
+			// Wait a bit if our buffer is full
 			auto avail = snd_pcm_avail_update(m_pPCM);
+			while (m_rBuffers.IsFull() && avail < nFrames)
+			{
+				if (vFDs.size() == 0) break;
+
+				err = poll(vFDs.data(), vFDs.size(), -1);
+				if (err < 0)
+					std::cerr << "poll returned " << err << "\n";
+
+				unsigned short revents;
+				err = snd_pcm_poll_descriptors_revents(m_pPCM, vFDs.data(), vFDs.size(), &revents);
+				if (err < 0)
+					std::cerr << "snd_pcm_poll_descriptors_revents returned " << err << "\n";
+
+				if (revents & POLLERR)
+					std::cerr << "POLLERR\n";
+
+				avail = snd_pcm_avail_update(m_pPCM);
+			}
+
+			// Write whatever we can
 			while (!m_rBuffers.IsEmpty() && avail >= nFrames)
 			{
 				auto vFullBuffer = m_rBuffers.GetFullBuffer();
@@ -114,10 +157,14 @@ namespace olc::sound::driver
 
 				while (nWritten < nFrames)
 				{
-					auto ret = snd_pcm_writei(m_pPCM, vFullBuffer.data() + nWritten, nFrames - nWritten);
-					if (ret > 0)
-						nWritten += ret;
-					else break; // TODO Skipping error handling is gigaunpog
+					auto err = snd_pcm_writei(m_pPCM, vFullBuffer.data() + nWritten, nFrames - nWritten);
+					if (err > 0)
+						nWritten += err;
+					else
+					{
+						std::cerr << "snd_pcm_writei returned " << err << "\n";
+						break;
+					}
 				}
 				avail = snd_pcm_avail_update(m_pPCM);
 			}

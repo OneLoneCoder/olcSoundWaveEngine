@@ -4,6 +4,8 @@
 ///[OLC_HM] START ALSA_H
 #if defined(SOUNDWAVE_USING_ALSA)
 #include <alsa/asoundlib.h>
+#include <poll.h>
+#include <iostream>
 
 namespace olc::sound::driver
 {

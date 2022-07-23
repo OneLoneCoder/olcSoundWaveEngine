@@ -117,12 +117,13 @@ namespace olc::sound
 		///[OLC_HM] INSERT swe_system_base.h SYSTEM_BASE_H
 	}
 
-
 }
 
 ///[OLC_HM] INSERT swe_system_winmm.h WINMM_H
 
 ///[OLC_HM] INSERT swe_system_alsa.h ALSA_H
+
+///[OLC_HM] INSERT swe_system_openal.h OPENAL_H
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
@@ -139,6 +140,7 @@ namespace olc::sound
 
 ///[OLC_HM] INSERT swe_system_winmm.cpp WINMM_CPP
 ///[OLC_HM] INSERT swe_system_alsa.cpp ALSA_CPP
+///[OLC_HM] INSERT swe_system_openal.cpp OPENAL_CPP
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

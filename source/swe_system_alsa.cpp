@@ -21,6 +21,14 @@ namespace olc::sound::driver
 	{
 		// Open PCM stream
 		int rc = snd_pcm_open(&m_pPCM, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+
+		// Clear global cache.
+		// This won't affect users who don't want to create multiple instances of this driver,
+		// but it will prevent valgrind from whining about "possibly lost" memory.
+		// If the user's ALSA setup uses a PulseAudio plugin, then valgrind will still compain
+		// about some "still reachable" data used by that plugin. TODO?
+		snd_config_update_free_global();
+
 		if (rc < 0)
 			return false;
 
@@ -79,6 +87,8 @@ namespace olc::sound::driver
 			snd_pcm_close(m_pPCM);
 			m_pPCM = nullptr;
 		}
+		// Clear the global cache again for good measure
+		snd_config_update_free_global();
 	}
 
 	void ALSA::DriverLoop()

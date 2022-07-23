@@ -67,5 +67,18 @@ namespace olc::sound::driver
 			nSamplesToProcess -= nSamplesGathered;
 		}
 	}
+
+	void Base::GetFullOutputBlock(std::vector<float>& vFloatBuffer)
+	{
+		uint32_t nSamplesToProcess = m_pHost->GetBlockSampleCount();
+		uint32_t nSampleOffset = 0;
+		while (nSamplesToProcess > 0)
+		{
+			uint32_t nSamplesGathered = m_pHost->FillOutputBuffer(vFloatBuffer, nSampleOffset, nSamplesToProcess);
+
+			nSampleOffset += nSamplesGathered;
+			nSamplesToProcess -= nSamplesGathered;
+		}
+	}
 	///[OLC_HM] END SYSTEM_BASE_CPP
 } // AudioDriver Base Implementation

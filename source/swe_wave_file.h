@@ -50,6 +50,16 @@ namespace olc::sound::wave
 			return m_nSampleRate;
 		}
 
+		double duration() const
+		{
+			return m_dDuration;
+		}
+
+		double durationInSamples() const
+		{
+			return m_dDurationInSamples;
+		}
+
 		bool LoadFile(const std::string& sFilename)
 		{
 			std::ifstream ifs(sFilename, std::ios::binary);
@@ -101,7 +111,9 @@ namespace olc::sound::wave
 			m_nSamples = nChunksize / (header.nChannels * m_nSampleSize);
 			m_nChannels = header.nChannels;
 			m_nSampleRate = header.nSamplesPerSec;
-			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
+			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);			
+			m_dDuration =  double(m_nSamples) / double(m_nSampleRate);
+			m_dDurationInSamples = double(m_nSamples);
 
 			T* pSample = m_pRawData.get();
 
@@ -155,6 +167,8 @@ namespace olc::sound::wave
 		size_t m_nChannels = 0;
 		size_t m_nSampleRate = 0;
 		size_t m_nSampleSize = 0;
+		double m_dDuration = 0.0;
+		double m_dDurationInSamples = 0.0;
 	};
 	///[OLC_HM] END WAVE_FILE_TEMPLATE
 }

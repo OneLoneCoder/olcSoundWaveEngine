@@ -42,6 +42,8 @@ namespace olc::sound
 			return false;
 		}
 
+		
+
 		bool LoadAudioWaveform(std::istream& sStream) { return false; }
 		bool LoadAudioWaveform(const char* pData, const size_t nBytes) { return false; }
 

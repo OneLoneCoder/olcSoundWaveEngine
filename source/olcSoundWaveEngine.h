@@ -156,6 +156,16 @@ namespace olc::sound
 			return m_nSampleRate;
 		}
 
+		double duration() const
+		{
+			return m_dDuration;
+		}
+
+		double durationInSamples() const
+		{
+			return m_dDurationInSamples;
+		}
+
 		bool LoadFile(const std::string& sFilename)
 		{
 			std::ifstream ifs(sFilename, std::ios::binary);
@@ -207,7 +217,9 @@ namespace olc::sound
 			m_nSamples = nChunksize / (header.nChannels * m_nSampleSize);
 			m_nChannels = header.nChannels;
 			m_nSampleRate = header.nSamplesPerSec;
-			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
+			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);			
+			m_dDuration =  double(m_nSamples) / double(m_nSampleRate);
+			m_dDurationInSamples = double(m_nSamples);
 
 			T* pSample = m_pRawData.get();
 
@@ -261,6 +273,8 @@ namespace olc::sound
 		size_t m_nChannels = 0;
 		size_t m_nSampleRate = 0;
 		size_t m_nSampleSize = 0;
+		double m_dDuration = 0.0;
+		double m_dDurationInSamples = 0.0;
 	};
 
 	template<typename T>
@@ -375,6 +389,8 @@ namespace olc::sound
 
 			return false;
 		}
+
+		
 
 		bool LoadAudioWaveform(std::istream& sStream) { return false; }
 		bool LoadAudioWaveform(const char* pData, const size_t nBytes) { return false; }
@@ -577,6 +593,18 @@ namespace olc::sound
 		class Oscillator : public Module
 		{
 		public:
+			enum class Type
+			{
+				Sine,
+				Saw,
+				Square,
+				Triangle,
+				PWM,
+				Wave,
+				Noise,
+			};
+
+		public:
 			// Primary frequency of oscillation
 			Property frequency = 0.0f;
 			// Primary amplitude of output
@@ -585,13 +613,24 @@ namespace olc::sound
 			Property lfo_input = 0.0f;
 			// Primary Output
 			Property output;
+			// Tweakable Parameter
+			Property parameter = 0.0;
+
+			Type waveform = Type::Sine;
+
+			Wave* pWave = nullptr;
 
 		private:
 			double phase_acc = 0.0f;
 			double max_frequency = 20000.0;
+			uint32_t random_seed = 0xB00B1E5;
+
+			double rndDouble(double min, double max);
+			uint32_t rnd();
+			
 
 		public:
-			void Update(uint32_t nChannel, double dTime, double dTimeStep) override;
+			virtual void Update(uint32_t nChannel, double dTime, double dTimeStep) override;
 
 		};
 	}
@@ -1030,13 +1069,58 @@ namespace olc::sound
 		void Oscillator::Update(uint32_t nChannel, double dTime, double dTimeStep)
 		{
 			// We use phase accumulation to combat change in parameter glitches
-			double w = frequency.value * max_frequency * 2.0 * 3.14159 * dTimeStep;
+			double w = frequency.value * max_frequency * dTimeStep;
 			phase_acc += w + lfo_input.value * frequency.value;
-			if (phase_acc >= 2.0 * 3.14159) phase_acc -= 2.0 * 3.14159;
+			if (phase_acc >= 2.0) phase_acc -= 2.0;
 
+			switch (waveform)
+			{
+			case Type::Sine:
+				output = amplitude.value * sin(phase_acc * 2.0 * 3.14159);
+				break;
 
-			
-			output = amplitude.value * sin(phase_acc);
+			case Type::Saw:
+				output = amplitude.value * (phase_acc - 1.0) * 2.0;
+				break;
+
+			case Type::Square:
+				output = amplitude.value * (phase_acc >= 1.0) ? 1.0 : -1.0;
+				break;
+
+			case Type::Triangle:
+				output = amplitude.value * (phase_acc < 1.0) ? (phase_acc * 0.5) : (1.0 - phase_acc * 0.5);
+				break;
+
+			case Type::PWM:
+				output = amplitude.value * (phase_acc >= (parameter.value + 1.0)) ? 1.0 : -1.0;
+				break;
+
+			case Type::Wave:
+				if(pWave != nullptr)
+					output = amplitude.value * pWave->vChannelView[nChannel].GetSample(phase_acc * 0.5 * pWave->file.durationInSamples());
+				break;
+
+			case Type::Noise:
+				output = amplitude.value * rndDouble(-1.0, 1.0);
+				break;
+
+			}
+		}
+
+		double Oscillator::rndDouble(double min, double max)
+		{
+			return ((double)rnd() / (double)(0x7FFFFFFF)) * (max - min) + min;
+		}
+
+		uint32_t Oscillator::rnd()
+		{
+			random_seed += 0xe120fc15;
+			uint64_t tmp;
+			tmp = (uint64_t)random_seed * 0x4a39b70d;
+			uint32_t m1 = (tmp >> 32) ^ tmp;
+			tmp = (uint64_t)m1 * 0x12fad5c9;
+			uint32_t m2 = (tmp >> 32) ^ tmp;
+			return m2;
 		}
 	}
 	}

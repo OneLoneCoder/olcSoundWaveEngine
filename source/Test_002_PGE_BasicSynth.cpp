@@ -16,6 +16,8 @@ public:
 protected: // Sound Specific
 	olc::sound::WaveEngine engine;
 
+	olc::sound::Wave sample1;
+
 	// Make a modular synthesizer!
 	olc::sound::synth::ModularSynth synth;
 	olc::sound::synth::modules::Oscillator osc1;
@@ -42,17 +44,24 @@ public:
 	{
 		// Construct Modular Synthesizer
 
+		sample1.LoadAudioWaveform("./assets/SampleB.wav");
+
 		// Primary oscillator
+		osc1.waveform = olc::sound::synth::modules::Oscillator::Type::Wave;
+		
+		osc1.pWave = &sample1;
+		
 		osc1.frequency = 440.0 / 20000.0;
 		osc1.amplitude = 0.5;
+		osc1.parameter = 0.5;
 		
 		// Secondary one acts as tremelo for primary
 		osc2.frequency = 10.0 / 20000.0;
-		osc2.amplitude = 0.25;
+		osc2.amplitude = 0.5;
 
 		// Third oscillator acts as LFO for primary
 		osc3.frequency = 5.0 / 20000.0;
-		osc3.amplitude = 0.1;
+		osc3.amplitude = 0.0;
 
 		synth.AddModule(&osc1);
 		synth.AddModule(&osc2);
@@ -84,10 +93,10 @@ public:
 			osc2.frequency.value *= 1.0 - 1.0 * fElapsedTime;
 		
 		if (GetKey(olc::Key::E).bHeld)
-			osc3.frequency.value *= 1.0 + 1.0 * fElapsedTime;
+			osc1.parameter.value += +1.0 * fElapsedTime;
 
 		if (GetKey(olc::Key::D).bHeld)
-			osc3.frequency.value *= 1.0 - 1.0 * fElapsedTime;
+			osc1.parameter.value += -1.0 * fElapsedTime;
 
 
 		Clear(olc::BLACK);

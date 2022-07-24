@@ -101,7 +101,7 @@ namespace olc::sound::wave
 			while (strncmp(dump, "data", 4) != 0)
 			{
 				// Not audio data, so just skip it
-				ifs.seekg(nChunksize, std::ios::_Seekcur);
+				ifs.seekg(nChunksize, std::ios::cur);
 				ifs.read(dump, sizeof(uint8_t) * 4); // Read next chunk header
 				ifs.read((char*)&nChunksize, sizeof(uint32_t)); // Read next chunk size
 			}

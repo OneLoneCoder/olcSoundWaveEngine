@@ -39,6 +39,9 @@ namespace olc::sound::driver
 		// SoundWave from a buffer of floats filled by the user.		
 		void ProcessOutputBlock(std::vector<float>& vFloatBuffer, std::vector<short>& vDACBuffer);
 
+		// [IMPLEMENT IF REQUIRED] Called by driver to exchange data with SoundWave System.
+		void GetFullOutputBlock(std::vector<float>& vFloatBuffer);
+
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};

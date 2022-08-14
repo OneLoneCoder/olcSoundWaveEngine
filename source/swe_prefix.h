@@ -14,6 +14,7 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 ///[OLC_HM] END STD_INCLUDES
 
 ///[OLC_HM] START COMPILER_SWITCHES

@@ -103,7 +103,7 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>..\Demos\HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
@@ -134,7 +134,7 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>..\Demos\HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
@@ -161,7 +161,8 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>..\Demos\HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h
+copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
@@ -192,7 +193,7 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Command>..\Demos\HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>

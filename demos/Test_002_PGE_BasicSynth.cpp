@@ -2,7 +2,7 @@
 #include "olcPixelGameEngine.h"
 
 #define OLC_SOUNDWAVE
-#include "olcSoundWaveEngine.h"
+#include "..\olcSoundWaveEngine.h"
 
 
 class BasicSynthesizer : public olc::PixelGameEngine
@@ -51,7 +51,7 @@ public:
 		
 		osc1.pWave = &sample1;
 		
-		osc1.frequency = 440.0 / 20000.0;
+		osc1.frequency = 5.0 / 20000.0;
 		osc1.amplitude = 0.5;
 		osc1.parameter = 0.5;
 		
@@ -93,10 +93,10 @@ public:
 			osc2.frequency.value *= 1.0 - 1.0 * fElapsedTime;
 		
 		if (GetKey(olc::Key::E).bHeld)
-			osc1.parameter.value += +1.0 * fElapsedTime;
+			osc3.frequency.value += +0.01 * fElapsedTime;
 
 		if (GetKey(olc::Key::D).bHeld)
-			osc1.parameter.value += -1.0 * fElapsedTime;
+			osc3.frequency.value += -0.01 * fElapsedTime;
 
 
 		Clear(olc::BLACK);

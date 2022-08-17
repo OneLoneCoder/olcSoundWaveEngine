@@ -18,6 +18,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\demos\olcPixelGameEngine.h" />
+    <ClInclude Include="..\olcSoundWaveEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\demos\Test_001_BasicCompilation.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\demos\Test_002_PGE_BasicSynth.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -95,9 +108,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Command>HeaderMaker.exe ..\source\olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -116,9 +132,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Command>HeaderMaker.exe ..\source\olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -133,9 +152,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -154,19 +179,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>HeaderMaker.exe olc_swe_template.h olcSoundWaveEngine.h</Command>
-      <Message>Creating Deployable Single Header - olcSoundWave.h</Message>
+      <Command>HeaderMaker.exe ..\source\olc_swe_template.h olcSoundWaveEngine.h</Command>
+      <Message>Creating Deployable Single Header - olcSoundWaveEngine.h</Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Test_001_BasicCompilation.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Test_002_PGE_BasicSynth.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

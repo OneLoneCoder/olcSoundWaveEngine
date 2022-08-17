@@ -15,10 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test_001_BasicCompilation.cpp">
+    <ClInclude Include="..\demos\olcPixelGameEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\olcSoundWaveEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\demos\Test_002_PGE_BasicSynth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test_002_PGE_BasicSynth.cpp">
+    <ClCompile Include="..\demos\Test_001_BasicCompilation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -75,7 +75,7 @@
 
 	Author
 	~~~~~~
-	David Barr, aka javidx9, ©OneLoneCoder 2019, 2020, 2021, 2022
+	David Barr, aka javidx9, ï¿½OneLoneCoder 2019, 2020, 2021, 2022
 */
 
 
@@ -94,18 +94,40 @@
 #ifndef OLC_SOUNDWAVE_H
 #define OLC_SOUNDWAVE_H
 
+#include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <vector>
 #include <list>
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 #include <functional>
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
-// TODO: Compiler/System Sensitivity
-#define SOUNDWAVE_USING_WINMM
+// Compiler/System Sensitivity
+#if !defined(SOUNDWAVE_USING_WINMM) && !defined(SOUNDWAVE_USING_WASAPI) &&  \
+    !defined(SOUNDWAVE_USING_XAUDIO) && !defined(SOUNDWAVE_USING_OPENAL) && \
+    !defined(SOUNDWAVE_USING_ALSA) && !defined(SOUNDWAVE_USING_SDLMIXER)    \
+
+	#if defined(_WIN32)
+		#define SOUNDWAVE_USING_WINMM
+	#endif
+	#if defined(__linux__)
+		#define SOUNDWAVE_USING_ALSA
+	#endif
+	#if defined(__APPLE__)
+		#define SOUNDWAVE_USING_SDLMIXER
+	#endif
+	#if defined(__EMSCRIPTEN__)
+		#define SOUNDWAVE_USING_SDLMIXER
+	#endif
+
+#endif
 
 namespace olc::sound
 {
@@ -207,7 +229,7 @@ namespace olc::sound
 			while (strncmp(dump, "data", 4) != 0)
 			{
 				// Not audio data, so just skip it
-				ifs.seekg(nChunksize, std::ios::_Seekcur);
+				ifs.seekg(nChunksize, std::ios::cur);
 				ifs.read(dump, sizeof(uint8_t) * 4); // Read next chunk header
 				ifs.read((char*)&nChunksize, sizeof(uint32_t)); // Read next chunk size
 			}
@@ -531,6 +553,9 @@ namespace olc::sound
 		// SoundWave from a buffer of floats filled by the user.		
 		void ProcessOutputBlock(std::vector<float>& vFloatBuffer, std::vector<short>& vDACBuffer);
 
+		// [IMPLEMENT IF REQUIRED] Called by driver to exchange data with SoundWave System.
+		void GetFullOutputBlock(std::vector<float>& vFloatBuffer);
+
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
@@ -676,6 +701,120 @@ namespace olc::sound::driver
 }
 #endif // SOUNDWAVE_USING_WINMM
 
+#if defined(SOUNDWAVE_USING_SDLMIXER)
+
+#include <SDL2/SDL_mixer.h>
+
+namespace olc::sound::driver
+{
+    class SDLMixer final : public Base
+    {
+    public:
+        explicit SDLMixer(WaveEngine* pHost);
+        ~SDLMixer() final;
+
+    protected:
+        bool Open(const std::string& sOutputDevice, const std::string& sInputDevice) final;
+        bool Start() final;
+        void Stop() final;
+        void Close() final;
+
+    private:
+        void FillChunkBuffer(const std::vector<float>& userData) const;
+
+        static void SDLMixerCallback(int channel);
+
+    private:
+        bool m_keepRunning = false;
+        Uint16 m_haveFormat = AUDIO_F32SYS;
+        std::vector<Uint8> audioBuffer;
+        Mix_Chunk audioChunk;
+
+        static SDLMixer* instance;
+    };
+}
+
+#endif // SOUNDWAVE_USING_SDLMIXER
+
+#if defined(SOUNDWAVE_USING_ALSA)
+#include <alsa/asoundlib.h>
+#include <poll.h>
+#include <iostream>
+
+namespace olc::sound::driver
+{
+	// Not thread-safe
+	template<typename T>
+	class RingBuffer
+	{
+	public:
+		RingBuffer(unsigned int bufnum, unsigned int buflen): m_vBuffers(bufnum)
+		{
+			for (auto &vBuffer : m_vBuffers)
+				vBuffer.resize(buflen);
+		}
+
+		std::vector<T>& GetFreeBuffer()
+		{
+			assert(!IsFull());
+
+			std::vector<T>& result = m_vBuffers[m_nTail];
+			m_nTail = Next(m_nTail);
+			return result;
+		}
+
+		std::vector<T>& GetFullBuffer()
+		{
+			assert(!IsEmpty());
+
+			std::vector<T>& result = m_vBuffers[m_nHead];
+			m_nHead = Next(m_nHead);
+			return result;
+		}
+
+		bool IsEmpty()
+		{
+			return m_nHead == m_nTail;
+		}
+
+		bool IsFull()
+		{
+			return m_nHead == Next(m_nTail);
+		}
+
+	private:
+		unsigned int Next(unsigned int current)
+		{
+			return (current + 1) % m_vBuffers.size();
+		}
+
+		std::vector<std::vector<T>> m_vBuffers;
+		unsigned int m_nHead = 0;
+		unsigned int m_nTail = 0;
+	};
+
+	class ALSA : public Base
+	{
+	public:
+		ALSA(WaveEngine* pHost);
+		~ALSA();
+
+	protected:
+		bool Open(const std::string& sOutputDevice, const std::string& sInputDevice) 	override;
+		bool Start() 	override;
+		void Stop()		override;
+		void Close()	override;
+
+	private:
+		void DriverLoop();
+
+		snd_pcm_t *m_pPCM;
+		RingBuffer<float> m_rBuffers;
+		std::atomic<bool> m_bDriverLoopActive{ false };
+		std::thread m_thDriverLoop;
+	};
+}
+#endif // SOUNDWAVE_USING_ALSA
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
@@ -964,6 +1103,19 @@ namespace olc::sound
 					vDACBuffer[nSampleID] = short(std::clamp(vFloatBuffer[nSampleID] * fMaxSample, fMinSample, fMaxSample));
 				}
 			}
+
+			nSampleOffset += nSamplesGathered;
+			nSamplesToProcess -= nSamplesGathered;
+		}
+	}
+
+	void Base::GetFullOutputBlock(std::vector<float>& vFloatBuffer)
+	{
+		uint32_t nSamplesToProcess = m_pHost->GetBlockSampleCount();
+		uint32_t nSampleOffset = 0;
+		while (nSamplesToProcess > 0)
+		{
+			uint32_t nSamplesGathered = m_pHost->FillOutputBuffer(vFloatBuffer, nSampleOffset, nSamplesToProcess);
 
 			nSampleOffset += nSamplesGathered;
 			nSamplesToProcess -= nSamplesGathered;
@@ -1277,6 +1429,331 @@ namespace olc::sound::driver
 		}
 	}
 } // WinMM Driver Implementation
+#endif
+#if defined(SOUNDWAVE_USING_SDLMIXER)
+
+namespace olc::sound::driver
+{
+
+SDLMixer* SDLMixer::instance = nullptr;
+
+SDLMixer::SDLMixer(olc::sound::WaveEngine* pHost)
+    : Base(pHost)
+{
+    instance = this;
+}
+
+SDLMixer::~SDLMixer()
+{
+    Stop();
+    Close();
+}
+
+bool SDLMixer::Open(const std::string& sOutputDevice, const std::string& sInputDevice)
+{
+    auto errc = Mix_OpenAudioDevice(static_cast<int>(m_pHost->GetSampleRate()),
+                                    AUDIO_F32,
+                                    static_cast<int>(m_pHost->GetChannels()),
+                                    static_cast<int>(m_pHost->GetBlockSampleCount()),
+                                    sOutputDevice == "DEFAULT" ? nullptr : sOutputDevice.c_str(),
+                                    SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+
+    // Query the actual format of the audio device, as we have allowed it to be changed.
+    if (errc || !Mix_QuerySpec(nullptr, &m_haveFormat, nullptr))
+    {
+        std::cerr << "Failed to open audio device '" << sOutputDevice << "'" << std::endl;
+        return false;
+    }
+
+    // Compute the Mix_Chunk buffer's size according to the format of the audio device
+    Uint32 bufferSize = 0;
+    switch (m_haveFormat)
+    {
+        case AUDIO_F32:
+        case AUDIO_S32:
+            bufferSize = m_pHost->GetBlockSampleCount() * 4;
+            break;
+        case AUDIO_S16:
+        case AUDIO_U16:
+            bufferSize = m_pHost->GetBlockSampleCount() * 2;
+            break;
+        case AUDIO_S8:
+        case AUDIO_U8:
+            bufferSize = m_pHost->GetBlockSampleCount() * 1;
+            break;
+        default:
+            std::cerr << "Audio format of device '" << sOutputDevice << "' is not supported" << std::endl;
+            return false;
+    }
+
+    // Allocate the buffer once. The size will never change after this
+    audioBuffer.resize(bufferSize);
+    audioChunk = {
+        0,                  // 0, as the chunk does not own the array
+        audioBuffer.data(), // Pointer to data array
+        bufferSize,         // Size in bytes
+        128                 // Volume; max by default as it's not controlled by the driver.
+    };
+
+    return true;
+}
+
+template<typename Int>
+void ConvertFloatTo(const std::vector<float>& fromArr, Int* toArr)
+{
+    static auto minVal = static_cast<float>(std::numeric_limits<Int>::min());
+    static auto maxVal = static_cast<float>(std::numeric_limits<Int>::max());
+    for (size_t i = 0; i != fromArr.size(); ++i)
+    {
+        toArr[i] = static_cast<Int>(std::clamp(fromArr[i] * maxVal, minVal, maxVal));
+    }
+}
+
+void SDLMixer::FillChunkBuffer(const std::vector<float>& userData) const
+{
+    // Since the audio device might have changed the format we need to provide,
+    // we convert the wave data from the user to that format.
+    switch (m_haveFormat)
+    {
+        case AUDIO_F32:
+            memcpy(audioChunk.abuf, userData.data(), audioChunk.alen);
+            break;
+        case AUDIO_S32:
+            ConvertFloatTo<Sint32>(userData, reinterpret_cast<Sint32*>(audioChunk.abuf));
+            break;
+        case AUDIO_S16:
+            ConvertFloatTo<Sint16>(userData, reinterpret_cast<Sint16*>(audioChunk.abuf));
+            break;
+        case AUDIO_U16:
+            ConvertFloatTo<Uint16>(userData, reinterpret_cast<Uint16*>(audioChunk.abuf));
+            break;
+        case AUDIO_S8:
+            ConvertFloatTo<Sint8>(userData, reinterpret_cast<Sint8*>(audioChunk.abuf));
+            break;
+        case AUDIO_U8:
+            ConvertFloatTo<Uint8>(userData, audioChunk.abuf);
+            break;
+    }
+}
+
+void SDLMixer::SDLMixerCallback(int channel)
+{
+    static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount());
+
+    // Don't add another chunk if we should not keep running
+    if (!instance->m_keepRunning)
+        return;
+
+    instance->GetFullOutputBlock(userData);
+    instance->FillChunkBuffer(userData);
+
+    if (Mix_PlayChannel(channel, &instance->audioChunk, 0) == -1)
+    {
+        std::cerr << "Error while playing Chunk" << std::endl;
+    }
+}
+
+bool SDLMixer::Start()
+{
+    m_keepRunning = true;
+
+    // Kickoff the audio driver
+    SDLMixerCallback(0);
+
+    // SDLMixer handles all other calls to reinsert user data
+    Mix_ChannelFinished(SDLMixerCallback);
+    return true;
+}
+
+void SDLMixer::Stop()
+{
+    m_keepRunning = false;
+
+    // Stop might be called multiple times, so we check whether the device is already closed
+    if (Mix_QuerySpec(nullptr, nullptr, nullptr))
+    {
+        for (int i = 0; i != m_pHost->GetChannels(); ++i)
+        {
+            if (Mix_Playing(i))
+                Mix_HaltChannel(i);
+        }
+    }
+}
+
+void SDLMixer::Close()
+{
+    Mix_CloseAudio();
+}
+}
+
+#endif // SOUNDWAVE_USING_SDLMIXER
+#if defined(SOUNDWAVE_USING_ALSA)
+// ALSA Driver Implementation
+namespace olc::sound::driver
+{
+	ALSA::ALSA(WaveEngine* pHost) : Base(pHost), m_rBuffers(pHost->GetBlocks(), pHost->GetBlockSampleCount())
+	{ }
+
+	ALSA::~ALSA()
+	{
+		Stop();
+		Close();
+	}
+
+	bool ALSA::Open(const std::string& sOutputDevice, const std::string& sInputDevice)
+	{
+		// Open PCM stream
+		int rc = snd_pcm_open(&m_pPCM, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+
+		// Clear global cache.
+		// This won't affect users who don't want to create multiple instances of this driver,
+		// but it will prevent valgrind from whining about "possibly lost" memory.
+		// If the user's ALSA setup uses a PulseAudio plugin, then valgrind will still compain
+		// about some "still reachable" data used by that plugin. TODO?
+		snd_config_update_free_global();
+
+		if (rc < 0)
+			return false;
+
+		// Prepare the parameter structure and set default parameters
+		snd_pcm_hw_params_t *params;
+		snd_pcm_hw_params_alloca(&params);
+		snd_pcm_hw_params_any(m_pPCM, params);
+
+		// Set other parameters
+		snd_pcm_hw_params_set_access(m_pPCM, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+		snd_pcm_hw_params_set_format(m_pPCM, params, SND_PCM_FORMAT_FLOAT);
+		snd_pcm_hw_params_set_rate(m_pPCM, params, m_pHost->GetSampleRate(), 0);
+		snd_pcm_hw_params_set_channels(m_pPCM, params, m_pHost->GetChannels());
+		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount() / m_pHost->GetChannels(), 0);
+		snd_pcm_hw_params_set_periods(m_pPCM, params, m_pHost->GetBlocks(), 0);
+
+		// Save these parameters
+		rc = snd_pcm_hw_params(m_pPCM, params);
+		if (rc < 0)
+			return false;
+
+		return true;
+	}
+
+	bool ALSA::Start()
+	{
+		// Unsure if really needed, helped prevent underrun on my setup
+		std::vector<float> vSilence(m_pHost->GetBlockSampleCount(), 0.0f);
+		snd_pcm_start(m_pPCM);
+		for (unsigned int i = 0; i < m_pHost->GetBlocks(); i++)
+			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount() / m_pHost->GetChannels());
+
+		snd_pcm_start(m_pPCM);
+		m_bDriverLoopActive = true;
+		m_thDriverLoop = std::thread(&ALSA::DriverLoop, this);
+
+		return true;
+	}
+
+	void ALSA::Stop()
+	{
+		// Signal the driver loop to exit
+		m_bDriverLoopActive = false;
+
+		// Wait for driver thread to exit gracefully
+		if (m_thDriverLoop.joinable())
+			m_thDriverLoop.join();
+
+		snd_pcm_drop(m_pPCM);
+	}
+
+	void ALSA::Close()
+	{
+		if (m_pPCM != nullptr)
+		{
+			snd_pcm_close(m_pPCM);
+			m_pPCM = nullptr;
+		}
+		// Clear the global cache again for good measure
+		snd_config_update_free_global();
+	}
+
+	void ALSA::DriverLoop()
+	{
+		const uint32_t nFrames = m_pHost->GetBlockSampleCount() / m_pHost->GetChannels();
+
+		int err;
+		std::vector<pollfd> vFDs;
+
+		int nFDs = snd_pcm_poll_descriptors_count(m_pPCM);
+		if (nFDs < 0)
+		{
+			std::cerr << "snd_pcm_poll_descriptors_count returned " << nFDs << "\n";
+			std::cerr << "disabling polling\n";
+			nFDs = 0;
+		}
+		else
+		{
+			vFDs.resize(nFDs);
+
+			err = snd_pcm_poll_descriptors(m_pPCM, vFDs.data(), vFDs.size());
+			if (err < 0)
+			{
+				std::cerr << "snd_pcm_poll_descriptors returned " << err << "\n";
+				std::cerr << "disabling polling\n";
+				vFDs = {};
+			}
+		}
+
+		// While the system is active, start requesting audio data
+		while (m_bDriverLoopActive)
+		{
+			if (!m_rBuffers.IsFull())
+			{
+				// Grab some audio data
+				auto& vFreeBuffer = m_rBuffers.GetFreeBuffer();
+				GetFullOutputBlock(vFreeBuffer);
+			}
+
+			// Wait a bit if our buffer is full
+			auto avail = snd_pcm_avail_update(m_pPCM);
+			while (m_rBuffers.IsFull() && avail < nFrames)
+			{
+				if (vFDs.size() == 0) break;
+
+				err = poll(vFDs.data(), vFDs.size(), -1);
+				if (err < 0)
+					std::cerr << "poll returned " << err << "\n";
+
+				unsigned short revents;
+				err = snd_pcm_poll_descriptors_revents(m_pPCM, vFDs.data(), vFDs.size(), &revents);
+				if (err < 0)
+					std::cerr << "snd_pcm_poll_descriptors_revents returned " << err << "\n";
+
+				if (revents & POLLERR)
+					std::cerr << "POLLERR\n";
+
+				avail = snd_pcm_avail_update(m_pPCM);
+			}
+
+			// Write whatever we can
+			while (!m_rBuffers.IsEmpty() && avail >= nFrames)
+			{
+				auto vFullBuffer = m_rBuffers.GetFullBuffer();
+				uint32_t nWritten = 0;
+
+				while (nWritten < nFrames)
+				{
+					auto err = snd_pcm_writei(m_pPCM, vFullBuffer.data() + nWritten, nFrames - nWritten);
+					if (err > 0)
+						nWritten += err;
+					else
+					{
+						std::cerr << "snd_pcm_writei returned " << err << "\n";
+						break;
+					}
+				}
+				avail = snd_pcm_avail_update(m_pPCM);
+			}
+		}
+	}
+} // ALSA Driver Implementation
 #endif
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION

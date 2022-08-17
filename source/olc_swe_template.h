@@ -75,7 +75,7 @@
 
 	Author
 	~~~~~~
-	David Barr, aka javidx9, ©OneLoneCoder 2019, 2020, 2021, 2022
+	David Barr, aka javidx9, ï¿½OneLoneCoder 2019, 2020, 2021, 2022
 */
 
 
@@ -130,6 +130,8 @@ namespace olc::sound
 
 ///[OLC_HM] INSERT swe_system_winmm.h WINMM_H
 
+///[OLC_HM] INSERT swe_system_sdlmixer.h SDLMIXER_H
+
 ///[OLC_HM] INSERT swe_system_alsa.h ALSA_H
 
 #ifdef OLC_SOUNDWAVE
@@ -155,6 +157,7 @@ namespace olc::sound
 
 
 ///[OLC_HM] INSERT swe_system_winmm.cpp WINMM_CPP
+///[OLC_HM] INSERT swe_system_sdlmixer.cpp SDLMIXER_CPP
 ///[OLC_HM] INSERT swe_system_alsa.cpp ALSA_CPP
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION

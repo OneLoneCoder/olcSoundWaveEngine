@@ -30,7 +30,3 @@
 *.exe
 *.out
 *.app
-/.vs
-/demos/x64/Debug
-/source/.vs/olcSoundWaveEngine
-/source/x64/Debug

@@ -80,7 +80,7 @@
 
 
 /*
-	1.00: olcPGEX_Sound.h reworked
+	0.01: olcPGEX_Sound.h reworked
 		  +Changed timekeeping to double, added accuracy fix - Thanks scripticuk
 		  +Concept of audio drivers and interface
 		  +All internal timing now double precision

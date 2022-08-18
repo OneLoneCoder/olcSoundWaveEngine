@@ -7,7 +7,6 @@ Audio playback can be a bit tricky. This framework simplifies playback by
 * Provides tools to synthesize sounds
 
 # License (OLC-3)
-
 Copyright 2018-2022 OneLoneCoder.com
 
 Redistribution and use in source and binary forms, with or without 

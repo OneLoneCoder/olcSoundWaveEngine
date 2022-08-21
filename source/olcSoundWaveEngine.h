@@ -311,6 +311,15 @@ namespace olc::sound
 					}
 					break;
 
+					case 3: // 24-bit
+					{
+						int32_t s = 0;
+						ifs.read((char*)&s, 3);
+						if (s & (1 << 23)) s |= 0xFF000000;
+						*pSample = T(s) / T(std::pow(2, 23)-1);
+					}
+					break;
+
 					case 4:
 					{
 						int32_t s = 0;
@@ -962,8 +971,8 @@ namespace olc::sound
 		WaveInstance wi;
 		wi.bLoop = bLoop;
 		wi.pWave = pWave;
-		wi.dSpeedModifier = dSpeed;
-		wi.dDuration = double(pWave->file.samples()) / double(pWave->file.samplerate()) / wi.dSpeedModifier;
+		wi.dSpeedModifier = dSpeed * double(pWave->file.samplerate()) / m_dSamplePerTime;
+		wi.dDuration = pWave->file.duration() / dSpeed;
 		wi.dInstanceTime = m_dGlobalTime;
 		m_listWaves.push_back(wi);
 		return std::prev(m_listWaves.end());
@@ -1031,7 +1040,7 @@ namespace olc::sound
 						else
 						{
 							// OR, sample the waveform form the correct channel
-							fSample += float(wave.pWave->vChannelView[nChannel].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
+							fSample += float(wave.pWave->vChannelView[nChannel % wave.pWave->file.channels()].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
 						}
 					}
 				}

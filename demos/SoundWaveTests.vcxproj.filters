@@ -29,5 +29,8 @@
     <ClCompile Include="..\demos\Test_001_BasicCompilation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test_003_ClickToPlayWaves.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

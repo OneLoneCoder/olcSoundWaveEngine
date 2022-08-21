@@ -140,6 +140,15 @@ namespace olc::sound::wave
 					}
 					break;
 
+					case 3: // 24-bit
+					{
+						int32_t s = 0;
+						ifs.read((char*)&s, 3);
+						if (s & (1 << 23)) s |= 0xFF000000;
+						*pSample = T(s) / T(std::pow(2, 23)-1);
+					}
+					break;
+
 					case 4:
 					{
 						int32_t s = 0;

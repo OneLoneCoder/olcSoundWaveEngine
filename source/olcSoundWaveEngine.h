@@ -80,7 +80,50 @@
 
 
 /*
-	1.00: olcPGEX_Sound.h reworked
+	Using & Installing On Microsoft Windows
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	Microsoft Visual Studio
+	~~~~~~~~~~~~~~~~~~~~~~~
+	1) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	2) That's it!
+
+
+	Code::Blocks
+	~~~~~~~~~~~~
+	1) Make sure your compiler toolchain is NOT the default one installed with Code::Blocks. That
+		one is old, out of date, and a general mess. Instead, use MSYS2 to install a recent and
+		decent GCC toolchain, then configure Code::Blocks to use it
+
+		Guide for installing recent GCC for Windows:
+		https://www.msys2.org/
+		Guide for configuring code::blocks:
+		https://solarianprogrammer.com/2019/11/05/install-gcc-windows/
+		https://solarianprogrammer.com/2019/11/16/install-codeblocks-gcc-windows-build-c-cpp-fortran-programs/
+
+	2) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	3) Add these libraries to "Linker Options": user32 winmm
+	4) Set this "Compiler Option": -std=c++17
+*/
+
+
+
+/*
+	Using in multiple-file projects
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	If you intend to use olcSoundWaveEngine across multiple files, it's important to only have one
+	instance of the implementation. This is done using the compiler preprocessor definition: OLC_SOUNDWAVE
+
+	This is defined typically before the header is included in teh translation unit you wish the implementation
+	to be associated with. To avoid things getting messy I recommend you create	a file "olcSoundWaveEngine.cpp" 
+	and that file includes ONLY the following code:
+
+	#define OLC_SOUNDWAVE
+	#include "olcSoundWaveEngine.h"
+*/
+
+/*
+	0.01: olcPGEX_Sound.h reworked
 		  +Changed timekeeping to double, added accuracy fix - Thanks scripticuk
 		  +Concept of audio drivers and interface
 		  +All internal timing now double precision

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "olcSoundWaveEngine", "olcSoundWaveEngine.vcxproj", "{4AE3B973-FDDC-4EFE-8955-299B51DFD990}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundWaveTests", "..\demos\SoundWaveTests.vcxproj", "{1EED794D-8B25-40D9-9650-4A4819FFA69C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4AE3B973-FDDC-4EFE-8955-299B51DFD990} = {4AE3B973-FDDC-4EFE-8955-299B51DFD990}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

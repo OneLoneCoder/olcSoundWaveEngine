@@ -49,9 +49,9 @@ get_filename_component(OutputExecutable ${_demoSource} NAME_WE)
 add_executable(${OutputExecutable} ${_demoSource})
 
 ######################################################################
-# MacOS: XCode
+# MacOS
 ######################################################################
-if(APPLE AND XCODE)
+if(APPLE)
     
     # OpenGL
     set(OpenGL_GL_PREFERENCE LEGACY)

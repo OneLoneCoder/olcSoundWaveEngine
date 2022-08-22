@@ -28,7 +28,7 @@
 		#define SOUNDWAVE_USING_WINMM
 	#endif
 	#if defined(__linux__)
-		#define SOUNDWAVE_USING_ALSA
+		#define SOUNDWAVE_USING_PULSE
 	#endif
 	#if defined(__APPLE__)
 		#define SOUNDWAVE_USING_SDLMIXER

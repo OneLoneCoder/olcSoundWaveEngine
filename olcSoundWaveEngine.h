@@ -755,7 +755,11 @@ namespace olc::sound::driver
 
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
+#if defined(__EMSCRIPTEN__)
 #include <SDL2/SDL_mixer.h>
+#else
+#include <SDL_mixer.h>
+#endif
 
 namespace olc::sound::driver
 {

@@ -137,6 +137,7 @@
 #ifndef OLC_SOUNDWAVE_H
 #define OLC_SOUNDWAVE_H
 
+#line 4 "swe_prefix.h"
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -151,7 +152,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#line 141 "olc_swe_template.h"
 
+#line 21 "swe_prefix.h"
 // Compiler/System Sensitivity
 #if !defined(SOUNDWAVE_USING_WINMM) && !defined(SOUNDWAVE_USING_WASAPI) &&  \
     !defined(SOUNDWAVE_USING_XAUDIO) && !defined(SOUNDWAVE_USING_OPENAL) && \
@@ -172,12 +175,14 @@
 	#endif
 
 #endif
+#line 143 "olc_swe_template.h"
 
 namespace olc::sound
 {
 
 	namespace wave
 	{
+#line 9 "swe_wave_file.h"
 	// Physically represents a .WAV file, but the data is stored
 	// as normalised floating point values
 	template<class T = float>
@@ -353,7 +358,9 @@ namespace olc::sound
 		double m_dDuration = 0.0;
 		double m_dDurationInSamples = 0.0;
 	};
+#line 150 "olc_swe_template.h"
 
+#line 8 "swe_wave_view.h"
 	template<typename T>
 	class View
 	{
@@ -430,8 +437,10 @@ namespace olc::sound
 		size_t m_nStride = 1;
 		size_t m_nOffset = 0;
 	};
+#line 152 "olc_swe_template.h"
 	}
 
+#line 10 "swe_wave_wave.h"
 	template<typename T = float>
 	class Wave_generic
 	{
@@ -477,7 +486,9 @@ namespace olc::sound
 	};
 
 	typedef Wave_generic<float> Wave;
+#line 155 "olc_swe_template.h"
 
+#line 15 "swe_wave_engine.h"
 	struct WaveInstance
 	{
 		Wave* pWave = nullptr;
@@ -576,9 +587,11 @@ namespace olc::sound
 		friend class driver::Base;
 
 	};
+#line 157 "olc_swe_template.h"
 
 	namespace driver
 	{
+#line 13 "swe_system_base.h"
 	// DRIVER DEVELOPERS ONLY!!!
 	//
 	// This interface allows SoundWave to exchange data with OS audio systems. It 
@@ -614,11 +627,13 @@ namespace olc::sound
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
+#line 161 "olc_swe_template.h"
 	}
 
 
 	namespace synth
 	{
+#line 11 "swe_synth_modular.h"
 		class Property
 		{
 		public:
@@ -667,7 +682,9 @@ namespace olc::sound
 			std::vector<std::pair<Property*, Property*>> m_vPatches;
 		};
 
+#line 167 "olc_swe_template.h"
 
+#line 9 "swe_synth_osc.h"
 	namespace modules
 	{
 		class Oscillator : public Module
@@ -714,11 +731,13 @@ namespace olc::sound
 
 		};
 	}
+#line 169 "olc_swe_template.h"
 	}
 
 
 }
 
+#line 5 "swe_system_winmm.h"
 #if defined(SOUNDWAVE_USING_WINMM)
 #define _WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -755,7 +774,9 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_WINMM
+#line 175 "olc_swe_template.h"
 
+#line 5 "swe_system_sdlmixer.h"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 #if defined(__EMSCRIPTEN__)
@@ -794,7 +815,9 @@ namespace olc::sound::driver
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
+#line 177 "olc_swe_template.h"
 
+#line 5 "swe_system_alsa.h"
 #if defined(SOUNDWAVE_USING_ALSA)
 #include <alsa/asoundlib.h>
 #include <poll.h>
@@ -874,7 +897,9 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_ALSA
+#line 179 "olc_swe_template.h"
 
+#line 5 "swe_system_pulse.h"
 #if defined(SOUNDWAVE_USING_PULSE)
 #include <pulse/simple.h>
 
@@ -901,12 +926,14 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_PULSE
+#line 181 "olc_swe_template.h"
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
 
 namespace olc::sound
 {	
+#line 6 "swe_wave_engine.cpp"
 	WaveEngine::WaveEngine()
 	{
 		m_sInputDevice = "NONE";
@@ -1133,9 +1160,11 @@ namespace olc::sound
 	{
 		return m_dTimePerSample;
 	}
+#line 188 "olc_swe_template.h"
 
 	namespace driver
 	{
+#line 8 "swe_system_base.cpp"
 	Base::Base(olc::sound::WaveEngine* pHost) : m_pHost(pHost)
 	{}
 
@@ -1211,10 +1240,12 @@ namespace olc::sound
 			nSamplesToProcess -= nSamplesGathered;
 		}
 	}
+#line 192 "olc_swe_template.h"
 	}	
 
 	namespace synth
 	{
+#line 10 "swe_synth_modular.cpp"
 	Property::Property(double f)
 	{
 		value = std::clamp(f, -1.0, 1.0);
@@ -1305,7 +1336,9 @@ namespace olc::sound
 		}
 	}
 
+#line 197 "olc_swe_template.h"
 
+#line 7 "swe_synth_osc.cpp"
 	namespace modules
 	{		
 		void Oscillator::Update(uint32_t nChannel, double dTime, double dTimeStep)
@@ -1365,11 +1398,13 @@ namespace olc::sound
 			return m2;
 		}
 	}
+#line 199 "olc_swe_template.h"
 	}
 }
 
 
 
+#line 7 "swe_system_winmm.cpp"
 #if defined(SOUNDWAVE_USING_WINMM)
 // WinMM Driver Implementation
 namespace olc::sound::driver
@@ -1520,6 +1555,8 @@ namespace olc::sound::driver
 	}
 } // WinMM Driver Implementation
 #endif
+#line 205 "olc_swe_template.h"
+#line 6 "swe_system_sdlmixer.cpp"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 namespace olc::sound::driver
@@ -1561,15 +1598,15 @@ bool SDLMixer::Open(const std::string& sOutputDevice, const std::string& sInputD
     {
         case AUDIO_F32:
         case AUDIO_S32:
-            bufferSize = m_pHost->GetBlockSampleCount() * 4;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 4;
             break;
         case AUDIO_S16:
         case AUDIO_U16:
-            bufferSize = m_pHost->GetBlockSampleCount() * 2;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 2;
             break;
         case AUDIO_S8:
         case AUDIO_U8:
-            bufferSize = m_pHost->GetBlockSampleCount() * 1;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 1;
             break;
         default:
             std::cerr << "Audio format of device '" << sOutputDevice << "' is not supported" << std::endl;
@@ -1628,7 +1665,12 @@ void SDLMixer::FillChunkBuffer(const std::vector<float>& userData) const
 
 void SDLMixer::SDLMixerCallback(int channel)
 {
-    static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount());
+    static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount() * instance->m_pHost->GetChannels());
+
+    if (channel != 0)
+    {
+        std::cerr << "Unexpected channel number" << std::endl;
+    }
 
     // Don't add another chunk if we should not keep running
     if (!instance->m_keepRunning)
@@ -1637,7 +1679,7 @@ void SDLMixer::SDLMixerCallback(int channel)
     instance->GetFullOutputBlock(userData);
     instance->FillChunkBuffer(userData);
 
-    if (Mix_PlayChannel(channel, &instance->audioChunk, 0) == -1)
+    if (Mix_PlayChannel(0, &instance->audioChunk, 0) == -1)
     {
         std::cerr << "Error while playing Chunk" << std::endl;
     }
@@ -1677,6 +1719,8 @@ void SDLMixer::Close()
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
+#line 206 "olc_swe_template.h"
+#line 7 "swe_system_alsa.cpp"
 #if defined(SOUNDWAVE_USING_ALSA)
 // ALSA Driver Implementation
 namespace olc::sound::driver
@@ -1845,6 +1889,8 @@ namespace olc::sound::driver
 	}
 } // ALSA Driver Implementation
 #endif
+#line 207 "olc_swe_template.h"
+#line 7 "swe_system_pulse.cpp"
 #if defined(SOUNDWAVE_USING_PULSE)
 // PULSE Driver Implementation
 #include <pulse/error.h>
@@ -1926,6 +1972,7 @@ namespace olc::sound::driver
 	}
 } // PulseAudio Driver Implementation
 #endif
+#line 208 "olc_swe_template.h"
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

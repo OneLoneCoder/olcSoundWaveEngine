@@ -8,7 +8,7 @@
 // ALSA Driver Implementation
 namespace olc::sound::driver
 {
-	ALSA::ALSA(WaveEngine* pHost) : Base(pHost), m_rBuffers(pHost->GetBlocks(), pHost->GetBlockSampleCount())
+	ALSA::ALSA(WaveEngine* pHost) : Base(pHost)
 	{ }
 
 	ALSA::~ALSA()
@@ -42,7 +42,7 @@ namespace olc::sound::driver
 		snd_pcm_hw_params_set_format(m_pPCM, params, SND_PCM_FORMAT_FLOAT);
 		snd_pcm_hw_params_set_rate(m_pPCM, params, m_pHost->GetSampleRate(), 0);
 		snd_pcm_hw_params_set_channels(m_pPCM, params, m_pHost->GetChannels());
-		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount() / m_pHost->GetChannels(), 0);
+		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount(), 0);
 		snd_pcm_hw_params_set_periods(m_pPCM, params, m_pHost->GetBlocks(), 0);
 
 		// Save these parameters
@@ -56,10 +56,12 @@ namespace olc::sound::driver
 	bool ALSA::Start()
 	{
 		// Unsure if really needed, helped prevent underrun on my setup
-		std::vector<float> vSilence(m_pHost->GetBlockSampleCount(), 0.0f);
+		std::vector<float> vSilence(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0.0f);
 		snd_pcm_start(m_pPCM);
 		for (unsigned int i = 0; i < m_pHost->GetBlocks(); i++)
-			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount() / m_pHost->GetChannels());
+			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount());
+
+		m_rBuffers.Resize(m_pHost->GetBlocks(), m_pHost->GetBlockSampleCount() * m_pHost->GetChannels());
 
 		snd_pcm_start(m_pPCM);
 		m_bDriverLoopActive = true;
@@ -93,7 +95,7 @@ namespace olc::sound::driver
 
 	void ALSA::DriverLoop()
 	{
-		const uint32_t nFrames = m_pHost->GetBlockSampleCount() / m_pHost->GetChannels();
+		const uint32_t nFrames = m_pHost->GetBlockSampleCount();
 
 		int err;
 		std::vector<pollfd> vFDs;

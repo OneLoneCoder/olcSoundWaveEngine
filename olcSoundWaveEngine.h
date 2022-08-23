@@ -107,6 +107,20 @@
 */
 
 
+/*
+	Using & Installing On Linux
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	GNU Compiler Collection (GCC)
+	~~~~~~~~~~~~~~~~~~~~~~~
+	1) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	2) Build with the following command:
+
+		g++ olcSoundWaveEngineExample.cpp -o olcSoundWaveEngineExample -lpulse -lpulse-simple -std=c++17
+
+	3) That's it!
+	
+*/
 
 /*
 	Using in multiple-file projects
@@ -152,7 +166,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#line 141 "olc_swe_template.h"
+#line 155 "olc_swe_template.h"
 
 #line 21 "swe_prefix.h"
 // Compiler/System Sensitivity
@@ -175,7 +189,7 @@
 	#endif
 
 #endif
-#line 143 "olc_swe_template.h"
+#line 157 "olc_swe_template.h"
 
 namespace olc::sound
 {
@@ -358,7 +372,7 @@ namespace olc::sound
 		double m_dDuration = 0.0;
 		double m_dDurationInSamples = 0.0;
 	};
-#line 150 "olc_swe_template.h"
+#line 164 "olc_swe_template.h"
 
 #line 8 "swe_wave_view.h"
 	template<typename T>
@@ -437,7 +451,7 @@ namespace olc::sound
 		size_t m_nStride = 1;
 		size_t m_nOffset = 0;
 	};
-#line 152 "olc_swe_template.h"
+#line 166 "olc_swe_template.h"
 	}
 
 #line 10 "swe_wave_wave.h"
@@ -486,7 +500,7 @@ namespace olc::sound
 	};
 
 	typedef Wave_generic<float> Wave;
-#line 155 "olc_swe_template.h"
+#line 169 "olc_swe_template.h"
 
 #line 15 "swe_wave_engine.h"
 	struct WaveInstance
@@ -587,7 +601,7 @@ namespace olc::sound
 		friend class driver::Base;
 
 	};
-#line 157 "olc_swe_template.h"
+#line 171 "olc_swe_template.h"
 
 	namespace driver
 	{
@@ -627,7 +641,7 @@ namespace olc::sound
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
-#line 161 "olc_swe_template.h"
+#line 175 "olc_swe_template.h"
 	}
 
 
@@ -682,7 +696,7 @@ namespace olc::sound
 			std::vector<std::pair<Property*, Property*>> m_vPatches;
 		};
 
-#line 167 "olc_swe_template.h"
+#line 181 "olc_swe_template.h"
 
 #line 9 "swe_synth_osc.h"
 	namespace modules
@@ -731,7 +745,7 @@ namespace olc::sound
 
 		};
 	}
-#line 169 "olc_swe_template.h"
+#line 183 "olc_swe_template.h"
 	}
 
 
@@ -774,7 +788,7 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_WINMM
-#line 175 "olc_swe_template.h"
+#line 189 "olc_swe_template.h"
 
 #line 5 "swe_system_sdlmixer.h"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
@@ -815,7 +829,7 @@ namespace olc::sound::driver
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
-#line 177 "olc_swe_template.h"
+#line 191 "olc_swe_template.h"
 
 #line 5 "swe_system_alsa.h"
 #if defined(SOUNDWAVE_USING_ALSA)
@@ -830,8 +844,12 @@ namespace olc::sound::driver
 	class RingBuffer
 	{
 	public:
-		RingBuffer(unsigned int bufnum, unsigned int buflen): m_vBuffers(bufnum)
+		RingBuffer()
+		{ }
+
+		void Resize(unsigned int bufnum = 0, unsigned int buflen = 0)
 		{
+			m_vBuffers.resize(bufnum);
 			for (auto &vBuffer : m_vBuffers)
 				vBuffer.resize(buflen);
 		}
@@ -897,7 +915,7 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_ALSA
-#line 179 "olc_swe_template.h"
+#line 193 "olc_swe_template.h"
 
 #line 5 "swe_system_pulse.h"
 #if defined(SOUNDWAVE_USING_PULSE)
@@ -926,7 +944,7 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_PULSE
-#line 181 "olc_swe_template.h"
+#line 195 "olc_swe_template.h"
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
@@ -1160,7 +1178,7 @@ namespace olc::sound
 	{
 		return m_dTimePerSample;
 	}
-#line 188 "olc_swe_template.h"
+#line 202 "olc_swe_template.h"
 
 	namespace driver
 	{
@@ -1240,7 +1258,7 @@ namespace olc::sound
 			nSamplesToProcess -= nSamplesGathered;
 		}
 	}
-#line 192 "olc_swe_template.h"
+#line 206 "olc_swe_template.h"
 	}	
 
 	namespace synth
@@ -1336,7 +1354,7 @@ namespace olc::sound
 		}
 	}
 
-#line 197 "olc_swe_template.h"
+#line 211 "olc_swe_template.h"
 
 #line 7 "swe_synth_osc.cpp"
 	namespace modules
@@ -1398,7 +1416,7 @@ namespace olc::sound
 			return m2;
 		}
 	}
-#line 199 "olc_swe_template.h"
+#line 213 "olc_swe_template.h"
 	}
 }
 
@@ -1555,7 +1573,7 @@ namespace olc::sound::driver
 	}
 } // WinMM Driver Implementation
 #endif
-#line 205 "olc_swe_template.h"
+#line 219 "olc_swe_template.h"
 #line 6 "swe_system_sdlmixer.cpp"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
@@ -1719,13 +1737,13 @@ void SDLMixer::Close()
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
-#line 206 "olc_swe_template.h"
+#line 220 "olc_swe_template.h"
 #line 7 "swe_system_alsa.cpp"
 #if defined(SOUNDWAVE_USING_ALSA)
 // ALSA Driver Implementation
 namespace olc::sound::driver
 {
-	ALSA::ALSA(WaveEngine* pHost) : Base(pHost), m_rBuffers(pHost->GetBlocks(), pHost->GetBlockSampleCount())
+	ALSA::ALSA(WaveEngine* pHost) : Base(pHost)
 	{ }
 
 	ALSA::~ALSA()
@@ -1759,7 +1777,7 @@ namespace olc::sound::driver
 		snd_pcm_hw_params_set_format(m_pPCM, params, SND_PCM_FORMAT_FLOAT);
 		snd_pcm_hw_params_set_rate(m_pPCM, params, m_pHost->GetSampleRate(), 0);
 		snd_pcm_hw_params_set_channels(m_pPCM, params, m_pHost->GetChannels());
-		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount() / m_pHost->GetChannels(), 0);
+		snd_pcm_hw_params_set_period_size(m_pPCM, params, m_pHost->GetBlockSampleCount(), 0);
 		snd_pcm_hw_params_set_periods(m_pPCM, params, m_pHost->GetBlocks(), 0);
 
 		// Save these parameters
@@ -1773,10 +1791,12 @@ namespace olc::sound::driver
 	bool ALSA::Start()
 	{
 		// Unsure if really needed, helped prevent underrun on my setup
-		std::vector<float> vSilence(m_pHost->GetBlockSampleCount(), 0.0f);
+		std::vector<float> vSilence(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0.0f);
 		snd_pcm_start(m_pPCM);
 		for (unsigned int i = 0; i < m_pHost->GetBlocks(); i++)
-			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount() / m_pHost->GetChannels());
+			snd_pcm_writei(m_pPCM, vSilence.data(), m_pHost->GetBlockSampleCount());
+
+		m_rBuffers.Resize(m_pHost->GetBlocks(), m_pHost->GetBlockSampleCount() * m_pHost->GetChannels());
 
 		snd_pcm_start(m_pPCM);
 		m_bDriverLoopActive = true;
@@ -1810,7 +1830,7 @@ namespace olc::sound::driver
 
 	void ALSA::DriverLoop()
 	{
-		const uint32_t nFrames = m_pHost->GetBlockSampleCount() / m_pHost->GetChannels();
+		const uint32_t nFrames = m_pHost->GetBlockSampleCount();
 
 		int err;
 		std::vector<pollfd> vFDs;
@@ -1889,7 +1909,7 @@ namespace olc::sound::driver
 	}
 } // ALSA Driver Implementation
 #endif
-#line 207 "olc_swe_template.h"
+#line 221 "olc_swe_template.h"
 #line 7 "swe_system_pulse.cpp"
 #if defined(SOUNDWAVE_USING_PULSE)
 // PULSE Driver Implementation
@@ -1972,7 +1992,7 @@ namespace olc::sound::driver
 	}
 } // PulseAudio Driver Implementation
 #endif
-#line 208 "olc_swe_template.h"
+#line 222 "olc_swe_template.h"
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

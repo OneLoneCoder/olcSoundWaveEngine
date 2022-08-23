@@ -31,10 +31,15 @@
 *.out
 *.app
 /.vs
+.vscode
 /demos/x64/Debug
 /source/.vs/olcSoundWaveEngine
 /source/x64/Debug/olcSound.4ae3b973.tlog
 /source/x64/Debug
+
+# ignore binary of tools
+tools/headerify
+tools/headerify.exe
 
 # CMake Intermediates
 build

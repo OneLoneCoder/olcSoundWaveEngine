@@ -107,6 +107,20 @@
 */
 
 
+/*
+	Using & Installing On Linux
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	GNU Compiler Collection (GCC)
+	~~~~~~~~~~~~~~~~~~~~~~~
+	1) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	2) Build with the following command:
+
+		g++ olcSoundWaveEngineExample.cpp -o olcSoundWaveEngineExample -lpulse -lpulse-simple -std=c++17
+
+	3) That's it!
+	
+*/
 
 /*
 	Using in multiple-file projects

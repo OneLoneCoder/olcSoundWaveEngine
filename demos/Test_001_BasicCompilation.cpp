@@ -1,6 +1,6 @@
 
 #define OLC_SOUNDWAVE
-#include "olcSoundWaveEngine.h"
+#include "../olcSoundWaveEngine.h"
 
 olc::sound::WaveEngine engine;
 

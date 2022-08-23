@@ -2,7 +2,7 @@
 #include "olcPixelGameEngine.h"
 
 #define OLC_SOUNDWAVE
-#include "..\olcSoundWaveEngine.h"
+#include "../olcSoundWaveEngine.h"
 
 
 class Example003 : public olc::PixelGameEngine

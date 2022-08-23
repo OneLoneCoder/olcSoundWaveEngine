@@ -79,7 +79,8 @@ namespace olc::sound::driver
 		if (m_thDriverLoop.joinable())
 			m_thDriverLoop.join();
 
-		snd_pcm_drop(m_pPCM);
+		if (m_pPCM != nullptr)
+			snd_pcm_drop(m_pPCM);
 	}
 
 	void ALSA::Close()

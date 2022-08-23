@@ -20,6 +20,8 @@ namespace olc::sound::wave
 			m_nSampleSize = nSampleSize;
 			m_nSamples = nSamples;
 			m_nSampleRate = nSampleRate;
+			m_dDuration = double(m_nSamples) / double(m_nSampleRate);
+			m_dDurationInSamples = double(m_nSamples);
 
 			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
 		}

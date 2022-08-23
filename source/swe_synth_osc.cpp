@@ -57,9 +57,9 @@ namespace olc::sound::synth
 			random_seed += 0xe120fc15;
 			uint64_t tmp;
 			tmp = (uint64_t)random_seed * 0x4a39b70d;
-			uint32_t m1 = (tmp >> 32) ^ tmp;
+			uint32_t m1 = uint32_t(((tmp >> 32) ^ tmp) & 0xFFFFFFFF);
 			tmp = (uint64_t)m1 * 0x12fad5c9;
-			uint32_t m2 = (tmp >> 32) ^ tmp;
+			uint32_t m2 = uint32_t(((tmp >> 32) ^ tmp) & 0xFFFFFFFF);
 			return m2;
 		}
 	}

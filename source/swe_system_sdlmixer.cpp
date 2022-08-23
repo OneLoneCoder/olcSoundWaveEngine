@@ -44,15 +44,15 @@ bool SDLMixer::Open(const std::string& sOutputDevice, const std::string& sInputD
     {
         case AUDIO_F32:
         case AUDIO_S32:
-            bufferSize = m_pHost->GetBlockSampleCount() * 4;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 4;
             break;
         case AUDIO_S16:
         case AUDIO_U16:
-            bufferSize = m_pHost->GetBlockSampleCount() * 2;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 2;
             break;
         case AUDIO_S8:
         case AUDIO_U8:
-            bufferSize = m_pHost->GetBlockSampleCount() * 1;
+            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 1;
             break;
         default:
             std::cerr << "Audio format of device '" << sOutputDevice << "' is not supported" << std::endl;
@@ -111,7 +111,12 @@ void SDLMixer::FillChunkBuffer(const std::vector<float>& userData) const
 
 void SDLMixer::SDLMixerCallback(int channel)
 {
-    static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount());
+    static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount() * instance->m_pHost->GetChannels());
+
+    if (channel != 0)
+    {
+        std::cerr << "Unexpected channel number" << std::endl;
+    }
 
     // Don't add another chunk if we should not keep running
     if (!instance->m_keepRunning)
@@ -120,7 +125,7 @@ void SDLMixer::SDLMixerCallback(int channel)
     instance->GetFullOutputBlock(userData);
     instance->FillChunkBuffer(userData);
 
-    if (Mix_PlayChannel(channel, &instance->audioChunk, 0) == -1)
+    if (Mix_PlayChannel(0, &instance->audioChunk, 0) == -1)
     {
         std::cerr << "Error while playing Chunk" << std::endl;
     }

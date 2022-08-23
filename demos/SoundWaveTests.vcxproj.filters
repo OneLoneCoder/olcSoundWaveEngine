@@ -32,5 +32,8 @@
     <ClCompile Include="Test_003_ClickToPlayWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test_004_PGE_RawDataPlayback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

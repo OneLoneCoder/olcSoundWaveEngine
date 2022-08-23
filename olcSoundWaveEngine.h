@@ -191,6 +191,8 @@ namespace olc::sound
 			m_nSampleSize = nSampleSize;
 			m_nSamples = nSamples;
 			m_nSampleRate = nSampleRate;
+			m_dDuration = double(m_nSamples) / double(m_nSampleRate);
+			m_dDurationInSamples = double(m_nSamples);
 
 			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
 		}
@@ -1039,7 +1041,7 @@ namespace olc::sound
 						}
 						else
 						{
-							// OR, sample the waveform form the correct channel
+							// OR, sample the waveform from the correct channel
 							fSample += float(wave.pWave->vChannelView[nChannel % wave.pWave->file.channels()].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
 						}
 					}

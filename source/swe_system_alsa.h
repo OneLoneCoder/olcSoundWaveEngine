@@ -14,8 +14,12 @@ namespace olc::sound::driver
 	class RingBuffer
 	{
 	public:
-		RingBuffer(unsigned int bufnum, unsigned int buflen): m_vBuffers(bufnum)
+		RingBuffer()
+		{ }
+
+		void Resize(unsigned int bufnum = 0, unsigned int buflen = 0)
 		{
+			m_vBuffers.resize(bufnum);
 			for (auto &vBuffer : m_vBuffers)
 				vBuffer.resize(buflen);
 		}

@@ -66,7 +66,7 @@ namespace olc::sound::driver
 	{
 		// We will be using this vector to transfer to the host for filling, with
 		// user sound data (float32, -1.0 --> +1.0)
-		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount(), 0.0f);
+		std::vector<float> vFloatBuffer(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels(), 0.0f);
 
 		// While the system is active, start requesting audio data
 		while (m_bDriverLoopActive)

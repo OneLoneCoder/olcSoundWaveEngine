@@ -20,6 +20,8 @@ namespace olc::sound::wave
 			m_nSampleSize = nSampleSize;
 			m_nSamples = nSamples;
 			m_nSampleRate = nSampleRate;
+			m_dDuration = double(m_nSamples) / double(m_nSampleRate);
+			m_dDurationInSamples = double(m_nSamples);
 
 			m_pRawData = std::make_unique<T[]>(m_nSamples * m_nChannels);
 		}
@@ -137,6 +139,15 @@ namespace olc::sound::wave
 						int16_t s = 0;
 						ifs.read((char*)&s, sizeof(int16_t));
 						*pSample = T(s) / T(std::numeric_limits<int16_t>::max());
+					}
+					break;
+
+					case 3: // 24-bit
+					{
+						int32_t s = 0;
+						ifs.read((char*)&s, 3);
+						if (s & (1 << 23)) s |= 0xFF000000;
+						*pSample = T(s) / T(std::pow(2, 23)-1);
 					}
 					break;
 

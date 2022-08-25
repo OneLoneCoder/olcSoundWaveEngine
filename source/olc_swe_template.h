@@ -1,6 +1,6 @@
 /*
 	+-------------------------------------------------------------+
-	|             OneLoneCoder Sound Wave Engine v0.01            |
+	|             OneLoneCoder Sound Wave Engine v0.02            |
 	|  "You wanted noise? Well is this loud enough?" - javidx9    |
 	+-------------------------------------------------------------+
 
@@ -66,18 +66,71 @@
 
 	Thanks
 	~~~~~~
-	Slavka     - OpenAL and ALSA
-	MaGetzUb   - XAudio
-	Gorbit99   - Testing, Bug Fixes
-	Cyberdroid - Testing, Bug Fixes
-	Dragoneye  - Testing
-	Puol       - Testing
+	Gorbit99, Dragoneye, Puol
 
-	Author
-	~~~~~~
-	David Barr, aka javidx9, �OneLoneCoder 2019, 2020, 2021, 2022
+	Authors
+	~~~~~~~
+	slavka, MaGetzUb, cstd, Moros1138 & javidx9
+
+	(c)OneLoneCoder 2019, 2020, 2021, 2022
 */
 
+
+/*
+	Using & Installing On Microsoft Windows
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	Microsoft Visual Studio
+	~~~~~~~~~~~~~~~~~~~~~~~
+	1) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	2) That's it!
+
+
+	Code::Blocks
+	~~~~~~~~~~~~
+	1) Make sure your compiler toolchain is NOT the default one installed with Code::Blocks. That
+		one is old, out of date, and a general mess. Instead, use MSYS2 to install a recent and
+		decent GCC toolchain, then configure Code::Blocks to use it
+
+		Guide for installing recent GCC for Windows:
+		https://www.msys2.org/
+		Guide for configuring code::blocks:
+		https://solarianprogrammer.com/2019/11/05/install-gcc-windows/
+		https://solarianprogrammer.com/2019/11/16/install-codeblocks-gcc-windows-build-c-cpp-fortran-programs/
+
+	2) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	3) Add these libraries to "Linker Options": user32 winmm
+	4) Set this "Compiler Option": -std=c++17
+*/
+
+/*
+	Using & Installing On Linux
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	GNU Compiler Collection (GCC)
+	~~~~~~~~~~~~~~~~~~~~~~~
+	1) Include the header file "olcSoundWaveEngine.h" from a .cpp file in your project.
+	2) Build with the following command:
+
+		g++ olcSoundWaveEngineExample.cpp -o olcSoundWaveEngineExample -lpulse -lpulse-simple -std=c++17
+
+	3) That's it!
+	
+*/
+
+/*
+	Using in multiple-file projects
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	If you intend to use olcSoundWaveEngine across multiple files, it's important to only have one
+	instance of the implementation. This is done using the compiler preprocessor definition: OLC_SOUNDWAVE
+
+	This is defined typically before the header is included in teh translation unit you wish the implementation
+	to be associated with. To avoid things getting messy I recommend you create	a file "olcSoundWaveEngine.cpp" 
+	and that file includes ONLY the following code:
+
+	#define OLC_SOUNDWAVE
+	#include "olcSoundWaveEngine.h"
+*/
 
 /*
 	0.01: olcPGEX_Sound.h reworked
@@ -88,6 +141,15 @@
 		  +Loading form WAV files
 		  +LERPed sampling from all buffers
 		  +Multi-channel audio support
+	0.02: +Support multi-channel wave files
+		  +Support for 24-bit wave files
+		  +Wave files are now sample rate invariant
+		  +Linux PulseAudio Updated
+		  +Linux ALSA Updated
+		  +WinMM Updated
+		  +CMake Compatibility
+		  =Fix wave format durations preventing playback
+		  =Various bug fixes
 */
 
 #pragma once
@@ -134,6 +196,8 @@ namespace olc::sound
 
 ///[OLC_HM] INSERT swe_system_alsa.h ALSA_H
 
+///[OLC_HM] INSERT swe_system_pulse.h PULSE_H
+
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
 
@@ -159,6 +223,7 @@ namespace olc::sound
 ///[OLC_HM] INSERT swe_system_winmm.cpp WINMM_CPP
 ///[OLC_HM] INSERT swe_system_sdlmixer.cpp SDLMIXER_CPP
 ///[OLC_HM] INSERT swe_system_alsa.cpp ALSA_CPP
+///[OLC_HM] INSERT swe_system_pulse.cpp PULSE_CPP
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

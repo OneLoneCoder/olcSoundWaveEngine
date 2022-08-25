@@ -31,6 +31,10 @@ namespace olc::sound
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 		m_driver = std::make_unique<driver::SDLMixer>(this);
 #endif
+
+#if defined(SOUNDWAVE_USING_PULSE)
+		m_driver = std::make_unique<driver::PulseAudio>(this);
+#endif
 	}
 
 	WaveEngine::~WaveEngine()
@@ -101,8 +105,8 @@ namespace olc::sound
 		WaveInstance wi;
 		wi.bLoop = bLoop;
 		wi.pWave = pWave;
-		wi.dSpeedModifier = dSpeed;
-		wi.dDuration = double(pWave->file.samples()) / double(pWave->file.samplerate()) / wi.dSpeedModifier;
+		wi.dSpeedModifier = dSpeed * double(pWave->file.samplerate()) / m_dSamplePerTime;
+		wi.dDuration = pWave->file.duration() / dSpeed;
 		wi.dInstanceTime = m_dGlobalTime;
 		m_listWaves.push_back(wi);
 		return std::prev(m_listWaves.end());
@@ -169,8 +173,8 @@ namespace olc::sound
 						}
 						else
 						{
-							// OR, sample the waveform form the correct channel
-							fSample += float(wave.pWave->vChannelView[nChannel].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
+							// OR, sample the waveform from the correct channel
+							fSample += float(wave.pWave->vChannelView[nChannel % wave.pWave->file.channels()].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
 						}
 					}
 				}

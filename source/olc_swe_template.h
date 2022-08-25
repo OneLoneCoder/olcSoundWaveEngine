@@ -1,6 +1,6 @@
 /*
 	+-------------------------------------------------------------+
-	|             OneLoneCoder Sound Wave Engine v0.01            |
+	|             OneLoneCoder Sound Wave Engine v0.02            |
 	|  "You wanted noise? Well is this loud enough?" - javidx9    |
 	+-------------------------------------------------------------+
 
@@ -66,16 +66,13 @@
 
 	Thanks
 	~~~~~~
-	Slavka     - OpenAL and ALSA
-	MaGetzUb   - XAudio
-	Gorbit99   - Testing, Bug Fixes
-	Cyberdroid - Testing, Bug Fixes
-	Dragoneye  - Testing
-	Puol       - Testing
+	Gorbit99, Dragoneye, Puol
 
-	Author
-	~~~~~~
-	David Barr, aka javidx9, �OneLoneCoder 2019, 2020, 2021, 2022
+	Authors
+	~~~~~~~
+	slavka, MaGetzUb, cstd, Moros1138 & javidx9
+
+	(c)OneLoneCoder 2019, 2020, 2021, 2022
 */
 
 
@@ -105,7 +102,6 @@
 	3) Add these libraries to "Linker Options": user32 winmm
 	4) Set this "Compiler Option": -std=c++17
 */
-
 
 /*
 	Using & Installing On Linux
@@ -145,6 +141,15 @@
 		  +Loading form WAV files
 		  +LERPed sampling from all buffers
 		  +Multi-channel audio support
+	0.02: +Support multi-channel wave files
+		  +Support for 24-bit wave files
+		  +Wave files are now sample rate invariant
+		  +Linux PulseAudio Updated
+		  +Linux ALSA Updated
+		  +WinMM Updated
+		  +CMake Compatibility
+		  =Fix wave format durations preventing playback
+		  =Various bug fixes
 */
 
 #pragma once

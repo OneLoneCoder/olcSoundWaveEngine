@@ -1,6 +1,6 @@
 /*
 	+-------------------------------------------------------------+
-	|             OneLoneCoder Sound Wave Engine v0.01            |
+	|             OneLoneCoder Sound Wave Engine v0.02            |
 	|  "You wanted noise? Well is this loud enough?" - javidx9    |
 	+-------------------------------------------------------------+
 
@@ -66,16 +66,13 @@
 
 	Thanks
 	~~~~~~
-	Slavka     - OpenAL and ALSA
-	MaGetzUb   - XAudio
-	Gorbit99   - Testing, Bug Fixes
-	Cyberdroid - Testing, Bug Fixes
-	Dragoneye  - Testing
-	Puol       - Testing
+	Gorbit99, Dragoneye, Puol
 
-	Author
-	~~~~~~
-	David Barr, aka javidx9, �OneLoneCoder 2019, 2020, 2021, 2022
+	Authors
+	~~~~~~~
+	slavka, MaGetzUb, cstd, Moros1138 & javidx9
+
+	(c)OneLoneCoder 2019, 2020, 2021, 2022
 */
 
 
@@ -105,7 +102,6 @@
 	3) Add these libraries to "Linker Options": user32 winmm
 	4) Set this "Compiler Option": -std=c++17
 */
-
 
 /*
 	Using & Installing On Linux
@@ -145,13 +141,21 @@
 		  +Loading form WAV files
 		  +LERPed sampling from all buffers
 		  +Multi-channel audio support
+	0.02: +Support multi-channel wave files
+		  +Support for 24-bit wave files
+		  +Wave files are now sample rate invariant
+		  +Linux PulseAudio Updated
+		  +Linux ALSA Updated
+		  +WinMM Updated
+		  +CMake Compatibility
+		  =Fix wave format durations preventing playback
+		  =Various bug fixes
 */
 
 #pragma once
 #ifndef OLC_SOUNDWAVE_H
 #define OLC_SOUNDWAVE_H
 
-#line 4 "swe_prefix.h"
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -166,9 +170,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#line 155 "olc_swe_template.h"
 
-#line 21 "swe_prefix.h"
 // Compiler/System Sensitivity
 #if !defined(SOUNDWAVE_USING_WINMM) && !defined(SOUNDWAVE_USING_WASAPI) &&  \
     !defined(SOUNDWAVE_USING_XAUDIO) && !defined(SOUNDWAVE_USING_OPENAL) && \
@@ -189,14 +191,12 @@
 	#endif
 
 #endif
-#line 157 "olc_swe_template.h"
 
 namespace olc::sound
 {
 
 	namespace wave
 	{
-#line 9 "swe_wave_file.h"
 	// Physically represents a .WAV file, but the data is stored
 	// as normalised floating point values
 	template<class T = float>
@@ -372,9 +372,7 @@ namespace olc::sound
 		double m_dDuration = 0.0;
 		double m_dDurationInSamples = 0.0;
 	};
-#line 164 "olc_swe_template.h"
 
-#line 8 "swe_wave_view.h"
 	template<typename T>
 	class View
 	{
@@ -451,10 +449,8 @@ namespace olc::sound
 		size_t m_nStride = 1;
 		size_t m_nOffset = 0;
 	};
-#line 166 "olc_swe_template.h"
 	}
 
-#line 10 "swe_wave_wave.h"
 	template<typename T = float>
 	class Wave_generic
 	{
@@ -500,9 +496,7 @@ namespace olc::sound
 	};
 
 	typedef Wave_generic<float> Wave;
-#line 169 "olc_swe_template.h"
 
-#line 15 "swe_wave_engine.h"
 	struct WaveInstance
 	{
 		Wave* pWave = nullptr;
@@ -601,11 +595,9 @@ namespace olc::sound
 		friend class driver::Base;
 
 	};
-#line 171 "olc_swe_template.h"
 
 	namespace driver
 	{
-#line 13 "swe_system_base.h"
 	// DRIVER DEVELOPERS ONLY!!!
 	//
 	// This interface allows SoundWave to exchange data with OS audio systems. It 
@@ -641,13 +633,11 @@ namespace olc::sound
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
-#line 175 "olc_swe_template.h"
 	}
 
 
 	namespace synth
 	{
-#line 11 "swe_synth_modular.h"
 		class Property
 		{
 		public:
@@ -696,9 +686,7 @@ namespace olc::sound
 			std::vector<std::pair<Property*, Property*>> m_vPatches;
 		};
 
-#line 181 "olc_swe_template.h"
 
-#line 9 "swe_synth_osc.h"
 	namespace modules
 	{
 		class Oscillator : public Module
@@ -745,13 +733,11 @@ namespace olc::sound
 
 		};
 	}
-#line 183 "olc_swe_template.h"
 	}
 
 
 }
 
-#line 5 "swe_system_winmm.h"
 #if defined(SOUNDWAVE_USING_WINMM)
 #define _WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -788,9 +774,7 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_WINMM
-#line 189 "olc_swe_template.h"
 
-#line 5 "swe_system_sdlmixer.h"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 #if defined(__EMSCRIPTEN__)
@@ -829,9 +813,7 @@ namespace olc::sound::driver
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
-#line 191 "olc_swe_template.h"
 
-#line 5 "swe_system_alsa.h"
 #if defined(SOUNDWAVE_USING_ALSA)
 #include <alsa/asoundlib.h>
 #include <poll.h>
@@ -915,9 +897,7 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_ALSA
-#line 193 "olc_swe_template.h"
 
-#line 5 "swe_system_pulse.h"
 #if defined(SOUNDWAVE_USING_PULSE)
 #include <pulse/simple.h>
 
@@ -944,14 +924,12 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_PULSE
-#line 195 "olc_swe_template.h"
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
 
 namespace olc::sound
 {	
-#line 6 "swe_wave_engine.cpp"
 	WaveEngine::WaveEngine()
 	{
 		m_sInputDevice = "NONE";
@@ -1178,11 +1156,9 @@ namespace olc::sound
 	{
 		return m_dTimePerSample;
 	}
-#line 202 "olc_swe_template.h"
 
 	namespace driver
 	{
-#line 8 "swe_system_base.cpp"
 	Base::Base(olc::sound::WaveEngine* pHost) : m_pHost(pHost)
 	{}
 
@@ -1258,12 +1234,10 @@ namespace olc::sound
 			nSamplesToProcess -= nSamplesGathered;
 		}
 	}
-#line 206 "olc_swe_template.h"
 	}	
 
 	namespace synth
 	{
-#line 10 "swe_synth_modular.cpp"
 	Property::Property(double f)
 	{
 		value = std::clamp(f, -1.0, 1.0);
@@ -1354,9 +1328,7 @@ namespace olc::sound
 		}
 	}
 
-#line 211 "olc_swe_template.h"
 
-#line 7 "swe_synth_osc.cpp"
 	namespace modules
 	{		
 		void Oscillator::Update(uint32_t nChannel, double dTime, double dTimeStep)
@@ -1416,13 +1388,11 @@ namespace olc::sound
 			return m2;
 		}
 	}
-#line 213 "olc_swe_template.h"
 	}
 }
 
 
 
-#line 7 "swe_system_winmm.cpp"
 #if defined(SOUNDWAVE_USING_WINMM)
 // WinMM Driver Implementation
 namespace olc::sound::driver
@@ -1573,8 +1543,6 @@ namespace olc::sound::driver
 	}
 } // WinMM Driver Implementation
 #endif
-#line 219 "olc_swe_template.h"
-#line 6 "swe_system_sdlmixer.cpp"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 namespace olc::sound::driver
@@ -1737,8 +1705,6 @@ void SDLMixer::Close()
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
-#line 220 "olc_swe_template.h"
-#line 7 "swe_system_alsa.cpp"
 #if defined(SOUNDWAVE_USING_ALSA)
 // ALSA Driver Implementation
 namespace olc::sound::driver
@@ -1910,8 +1876,6 @@ namespace olc::sound::driver
 	}
 } // ALSA Driver Implementation
 #endif
-#line 221 "olc_swe_template.h"
-#line 7 "swe_system_pulse.cpp"
 #if defined(SOUNDWAVE_USING_PULSE)
 // PULSE Driver Implementation
 #include <pulse/error.h>
@@ -1993,7 +1957,6 @@ namespace olc::sound::driver
 	}
 } // PulseAudio Driver Implementation
 #endif
-#line 222 "olc_swe_template.h"
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

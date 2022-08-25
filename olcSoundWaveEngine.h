@@ -64,6 +64,17 @@
 	Homepage:	https://www.onelonecoder.com
 	Patreon:	https://www.patreon.com/javidx9
 
+
+	Compiling with Emscripten
+	~~~~~~~~~~~~~~~~~~~~~~~~~
+	When compiling with Emscripten, you will include SDL mixer in your setting flags:
+	Add: -s USE_SDL_MIXER=2 
+
+	Your command should look something like:
+
+	em++ -std=c++17 -O2 -s ALLOW_MEMORY_GROWTH=1 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=2 -s USE_SDL_MIXER=2 -s USE_LIBPNG=1 ./YourSource.cpp -o pge.html
+
+
 	Thanks
 	~~~~~~
 	Slavka     - OpenAL and ALSA

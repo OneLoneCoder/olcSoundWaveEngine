@@ -24,15 +24,15 @@ namespace olc::sound::synth
 				break;
 
 			case Type::Square:
-				output = amplitude.value * (phase_acc >= 1.0) ? 1.0 : -1.0;
+				output = amplitude.value * ((phase_acc >= 1.0) ? 1.0 : -1.0);
 				break;
 
 			case Type::Triangle:
-				output = amplitude.value * (phase_acc < 1.0) ? (phase_acc * 0.5) : (1.0 - phase_acc * 0.5);
+				output = amplitude.value * ((phase_acc < 1.0) ? (phase_acc * 0.5) : (1.0 - phase_acc * 0.5));
 				break;
 
 			case Type::PWM:
-				output = amplitude.value * (phase_acc >= (parameter.value + 1.0)) ? 1.0 : -1.0;
+				output = amplitude.value * ((phase_acc >= (parameter.value + 1.0)) ? 1.0 : -1.0);
 				break;
 
 			case Type::Wave:

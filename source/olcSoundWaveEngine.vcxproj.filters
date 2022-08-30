@@ -69,6 +69,18 @@
     <ClInclude Include="swe_system_pulse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="swe_synth_pinkifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swe_synth_first_order_filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swe_synth_delay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swe_synth_n_mixer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="swe_system_base.cpp">
@@ -114,6 +126,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="swe_system_pulse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_pinkifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_first_order_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_delay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swe_synth_n_mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

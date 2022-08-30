@@ -204,9 +204,13 @@ copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
     <ClInclude Include="olc_swe_template.h" />
     <ClInclude Include="swe_dummy.h" />
     <ClInclude Include="swe_prefix.h" />
+    <ClInclude Include="swe_synth_delay.h" />
     <ClInclude Include="swe_synth_envelope.h" />
+    <ClInclude Include="swe_synth_first_order_filter.h" />
     <ClInclude Include="swe_synth_modular.h" />
+    <ClInclude Include="swe_synth_n_mixer.h" />
     <ClInclude Include="swe_synth_osc.h" />
+    <ClInclude Include="swe_synth_pinkifier.h" />
     <ClInclude Include="swe_system_pulse.h" />
     <ClInclude Include="swe_wave_engine.h" />
     <ClInclude Include="swe_system_alsa.h" />
@@ -220,9 +224,13 @@ copy olcSoundWaveEngine.h ..\olcSoundWaveEngine.h</Command>
     <ClInclude Include="swe_wave_wave.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="swe_synth_delay.cpp" />
     <ClCompile Include="swe_synth_envelope.cpp" />
+    <ClCompile Include="swe_synth_first_order_filter.cpp" />
     <ClCompile Include="swe_synth_modular.cpp" />
+    <ClCompile Include="swe_synth_n_mixer.cpp" />
     <ClCompile Include="swe_synth_osc.cpp" />
+    <ClCompile Include="swe_synth_pinkifier.cpp" />
     <ClCompile Include="swe_system_pulse.cpp" />
     <ClCompile Include="swe_test_basics.cpp" />
     <ClCompile Include="swe_wave_engine.cpp" />

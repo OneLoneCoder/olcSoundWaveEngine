@@ -10,14 +10,13 @@ namespace olc::sound::synth
 		template<size_t max_ms, size_t samplerate>
 		void Delay<max_ms, samplerate>::Update(uint32_t nChannel, double dTime, double dTimeStep)
 		{
-			for (size_t i = state.size() - 1; i > 0; i--) {
-				state[i] = state[i - 1];
-			}
+			state[input_index] = input.value * decay.value;
+			input_index = (input_index + 1) % state.size();
 
-			//Based on the delay value, sample from the delay line buffer
-			size_t out_index = std::min(state.size() - 1, static_cast<size_t>(delay.value * samplerate));
-			state[0] = input.value * decay.value;
-			output = state[out_index];
+			//Determine where we should sample from based on the desired delay amount
+			size_t out_dist = std::min(state.size() - 1, static_cast<size_t>(delay.value * max_delay * samplerate));
+			output_index = (input_index - out_dist + state.size()) % state.size();
+			output = state[output_index];
 		}
 	}
 	///[OLC_HM] END SYNTH_DELAY_CPP

@@ -156,6 +156,7 @@
 #ifndef OLC_SOUNDWAVE_H
 #define OLC_SOUNDWAVE_H
 
+#line 4 "swe_prefix.h"
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -170,7 +171,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#line 160 "olc_swe_template.h"
 
+#line 21 "swe_prefix.h"
 // Compiler/System Sensitivity
 #if !defined(SOUNDWAVE_USING_WINMM) && !defined(SOUNDWAVE_USING_WASAPI) &&  \
     !defined(SOUNDWAVE_USING_XAUDIO) && !defined(SOUNDWAVE_USING_OPENAL) && \
@@ -191,12 +194,14 @@
 	#endif
 
 #endif
+#line 162 "olc_swe_template.h"
 
 namespace olc::sound
 {
 
 	namespace wave
 	{
+#line 9 "swe_wave_file.h"
 	// Physically represents a .WAV file, but the data is stored
 	// as normalised floating point values
 	template<class T = float>
@@ -372,7 +377,9 @@ namespace olc::sound
 		double m_dDuration = 0.0;
 		double m_dDurationInSamples = 0.0;
 	};
+#line 169 "olc_swe_template.h"
 
+#line 8 "swe_wave_view.h"
 	template<typename T>
 	class View
 	{
@@ -449,8 +456,10 @@ namespace olc::sound
 		size_t m_nStride = 1;
 		size_t m_nOffset = 0;
 	};
+#line 171 "olc_swe_template.h"
 	}
 
+#line 10 "swe_wave_wave.h"
 	template<typename T = float>
 	class Wave_generic
 	{
@@ -496,7 +505,9 @@ namespace olc::sound
 	};
 
 	typedef Wave_generic<float> Wave;
+#line 174 "olc_swe_template.h"
 
+#line 15 "swe_wave_engine.h"
 	struct WaveInstance
 	{
 		Wave* pWave = nullptr;
@@ -595,9 +606,11 @@ namespace olc::sound
 		friend class driver::Base;
 
 	};
+#line 176 "olc_swe_template.h"
 
 	namespace driver
 	{
+#line 13 "swe_system_base.h"
 	// DRIVER DEVELOPERS ONLY!!!
 	//
 	// This interface allows SoundWave to exchange data with OS audio systems. It 
@@ -633,11 +646,13 @@ namespace olc::sound
 		// Handle to SoundWave, to interrogate optons, and get user data
 		WaveEngine* m_pHost = nullptr;
 	};
+#line 180 "olc_swe_template.h"
 	}
 
 
 	namespace synth
 	{
+#line 11 "swe_synth_modular.h"
 		class Property
 		{
 		public:
@@ -686,7 +701,9 @@ namespace olc::sound
 			std::vector<std::pair<Property*, Property*>> m_vPatches;
 		};
 
+#line 186 "olc_swe_template.h"
 
+#line 9 "swe_synth_osc.h"
 	namespace modules
 	{
 		class Oscillator : public Module
@@ -733,11 +750,13 @@ namespace olc::sound
 
 		};
 	}
+#line 188 "olc_swe_template.h"
 	}
 
 
 }
 
+#line 5 "swe_system_winmm.h"
 #if defined(SOUNDWAVE_USING_WINMM)
 #define _WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -774,13 +793,19 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_WINMM
+#line 194 "olc_swe_template.h"
 
+#line 5 "swe_system_sdlmixer.h"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 #if defined(__EMSCRIPTEN__)
 #include <SDL2/SDL_mixer.h>
 #else
 #include <SDL_mixer.h>
+#endif
+
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__) && !defined(SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD)
+#define SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
 #endif
 
 namespace olc::sound::driver
@@ -798,22 +823,31 @@ namespace olc::sound::driver
         void Close() final;
 
     private:
-        void FillChunkBuffer(const std::vector<float>& userData) const;
+        void FillChunkBuffer(const std::vector<float>& userData);
 
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
         static void SDLMixerCallback(int channel);
+#else
+        void DriverLoop();
+#endif
 
     private:
-        bool m_keepRunning = false;
-        Uint16 m_haveFormat = AUDIO_F32SYS;
-        std::vector<Uint8> audioBuffer;
-        Mix_Chunk audioChunk;
-
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
         static SDLMixer* instance;
+#else
+        std::thread m_driverThread{};
+#endif
+        Uint16 m_haveFormat = AUDIO_F32SYS;
+        std::vector<Uint8> m_audioBuffer{};
+        Mix_Chunk m_audioChunk{};
+        std::atomic<bool> m_keepRunning = false;
     };
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
+#line 196 "olc_swe_template.h"
 
+#line 5 "swe_system_alsa.h"
 #if defined(SOUNDWAVE_USING_ALSA)
 #include <alsa/asoundlib.h>
 #include <poll.h>
@@ -897,7 +931,9 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_ALSA
+#line 198 "olc_swe_template.h"
 
+#line 5 "swe_system_pulse.h"
 #if defined(SOUNDWAVE_USING_PULSE)
 #include <pulse/simple.h>
 
@@ -924,12 +960,14 @@ namespace olc::sound::driver
 	};
 }
 #endif // SOUNDWAVE_USING_PULSE
+#line 200 "olc_swe_template.h"
 
 #ifdef OLC_SOUNDWAVE
 #undef OLC_SOUNDWAVE
 
 namespace olc::sound
 {	
+#line 6 "swe_wave_engine.cpp"
 	WaveEngine::WaveEngine()
 	{
 		m_sInputDevice = "NONE";
@@ -1156,9 +1194,11 @@ namespace olc::sound
 	{
 		return m_dTimePerSample;
 	}
+#line 207 "olc_swe_template.h"
 
 	namespace driver
 	{
+#line 8 "swe_system_base.cpp"
 	Base::Base(olc::sound::WaveEngine* pHost) : m_pHost(pHost)
 	{}
 
@@ -1234,10 +1274,12 @@ namespace olc::sound
 			nSamplesToProcess -= nSamplesGathered;
 		}
 	}
+#line 211 "olc_swe_template.h"
 	}	
 
 	namespace synth
 	{
+#line 10 "swe_synth_modular.cpp"
 	Property::Property(double f)
 	{
 		value = std::clamp(f, -1.0, 1.0);
@@ -1328,7 +1370,9 @@ namespace olc::sound
 		}
 	}
 
+#line 216 "olc_swe_template.h"
 
+#line 7 "swe_synth_osc.cpp"
 	namespace modules
 	{		
 		void Oscillator::Update(uint32_t nChannel, double dTime, double dTimeStep)
@@ -1388,11 +1432,13 @@ namespace olc::sound
 			return m2;
 		}
 	}
+#line 218 "olc_swe_template.h"
 	}
 }
 
 
 
+#line 7 "swe_system_winmm.cpp"
 #if defined(SOUNDWAVE_USING_WINMM)
 // WinMM Driver Implementation
 namespace olc::sound::driver
@@ -1543,17 +1589,23 @@ namespace olc::sound::driver
 	}
 } // WinMM Driver Implementation
 #endif
+#line 224 "olc_swe_template.h"
+#line 10 "swe_system_sdlmixer.cpp"
 #if defined(SOUNDWAVE_USING_SDLMIXER)
 
 namespace olc::sound::driver
 {
 
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
 SDLMixer* SDLMixer::instance = nullptr;
+#endif
 
 SDLMixer::SDLMixer(olc::sound::WaveEngine* pHost)
     : Base(pHost)
 {
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
     instance = this;
+#endif
 }
 
 SDLMixer::~SDLMixer()
@@ -1582,30 +1634,30 @@ bool SDLMixer::Open(const std::string& sOutputDevice, const std::string& sInputD
     Uint32 bufferSize = 0;
     switch (m_haveFormat)
     {
-        case AUDIO_F32:
-        case AUDIO_S32:
-            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 4;
-            break;
-        case AUDIO_S16:
-        case AUDIO_U16:
-            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 2;
-            break;
-        case AUDIO_S8:
-        case AUDIO_U8:
-            bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 1;
-            break;
-        default:
-            std::cerr << "Audio format of device '" << sOutputDevice << "' is not supported" << std::endl;
-            return false;
+    case AUDIO_F32:
+    case AUDIO_S32:
+        bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 4;
+        break;
+    case AUDIO_S16:
+    case AUDIO_U16:
+        bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 2;
+        break;
+    case AUDIO_S8:
+    case AUDIO_U8:
+        bufferSize = m_pHost->GetBlockSampleCount() * m_pHost->GetChannels() * 1;
+        break;
+    default:
+        std::cerr << "Audio format of device '" << sOutputDevice << "' is not supported" << std::endl;
+        return false;
     }
 
     // Allocate the buffer once. The size will never change after this
-    audioBuffer.resize(bufferSize);
-    audioChunk = {
-        0,                  // 0, as the chunk does not own the array
-        audioBuffer.data(), // Pointer to data array
-        bufferSize,         // Size in bytes
-        128                 // Volume; max by default as it's not controlled by the driver.
+    m_audioBuffer.resize(bufferSize);
+    m_audioChunk = {
+        0,                    // 0, as the chunk does not own the array
+        m_audioBuffer.data(), // Pointer to data array
+        bufferSize,           // Size in bytes
+        128                   // Volume; max by default as it's not controlled by the driver.
     };
 
     return true;
@@ -1616,47 +1668,45 @@ void ConvertFloatTo(const std::vector<float>& fromArr, Int* toArr)
 {
     static auto minVal = static_cast<float>(std::numeric_limits<Int>::min());
     static auto maxVal = static_cast<float>(std::numeric_limits<Int>::max());
+
     for (size_t i = 0; i != fromArr.size(); ++i)
-    {
         toArr[i] = static_cast<Int>(std::clamp(fromArr[i] * maxVal, minVal, maxVal));
-    }
 }
 
-void SDLMixer::FillChunkBuffer(const std::vector<float>& userData) const
+void SDLMixer::FillChunkBuffer(const std::vector<float>& userData)
 {
     // Since the audio device might have changed the format we need to provide,
     // we convert the wave data from the user to that format.
     switch (m_haveFormat)
     {
-        case AUDIO_F32:
-            memcpy(audioChunk.abuf, userData.data(), audioChunk.alen);
-            break;
-        case AUDIO_S32:
-            ConvertFloatTo<Sint32>(userData, reinterpret_cast<Sint32*>(audioChunk.abuf));
-            break;
-        case AUDIO_S16:
-            ConvertFloatTo<Sint16>(userData, reinterpret_cast<Sint16*>(audioChunk.abuf));
-            break;
-        case AUDIO_U16:
-            ConvertFloatTo<Uint16>(userData, reinterpret_cast<Uint16*>(audioChunk.abuf));
-            break;
-        case AUDIO_S8:
-            ConvertFloatTo<Sint8>(userData, reinterpret_cast<Sint8*>(audioChunk.abuf));
-            break;
-        case AUDIO_U8:
-            ConvertFloatTo<Uint8>(userData, audioChunk.abuf);
-            break;
+    case AUDIO_F32:
+        memcpy(m_audioChunk.abuf, userData.data(), m_audioChunk.alen);
+        break;
+    case AUDIO_S32:
+        ConvertFloatTo<Sint32>(userData, reinterpret_cast<Sint32*>(m_audioChunk.abuf));
+        break;
+    case AUDIO_S16:
+        ConvertFloatTo<Sint16>(userData, reinterpret_cast<Sint16*>(m_audioChunk.abuf));
+        break;
+    case AUDIO_U16:
+        ConvertFloatTo<Uint16>(userData, reinterpret_cast<Uint16*>(m_audioChunk.abuf));
+        break;
+    case AUDIO_S8:
+        ConvertFloatTo<Sint8>(userData, reinterpret_cast<Sint8*>(m_audioChunk.abuf));
+        break;
+    case AUDIO_U8:
+        ConvertFloatTo<Uint8>(userData, m_audioChunk.abuf);
+        break;
     }
 }
 
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
 void SDLMixer::SDLMixerCallback(int channel)
 {
     static std::vector<float> userData(instance->m_pHost->GetBlockSampleCount() * instance->m_pHost->GetChannels());
 
     if (channel != 0)
-    {
         std::cerr << "Unexpected channel number" << std::endl;
-    }
 
     // Don't add another chunk if we should not keep running
     if (!instance->m_keepRunning)
@@ -1665,21 +1715,24 @@ void SDLMixer::SDLMixerCallback(int channel)
     instance->GetFullOutputBlock(userData);
     instance->FillChunkBuffer(userData);
 
-    if (Mix_PlayChannel(0, &instance->audioChunk, 0) == -1)
-    {
+    if (Mix_PlayChannel(0, &instance->m_audioChunk, 0) == -1)
         std::cerr << "Error while playing Chunk" << std::endl;
-    }
 }
+#endif
 
 bool SDLMixer::Start()
 {
+    // Kickoff the audio driver
     m_keepRunning = true;
 
-    // Kickoff the audio driver
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
     SDLMixerCallback(0);
-
     // SDLMixer handles all other calls to reinsert user data
     Mix_ChannelFinished(SDLMixerCallback);
+#else
+    m_driverThread = std::thread([this](){ DriverLoop(); });
+#endif
+
     return true;
 }
 
@@ -1689,22 +1742,42 @@ void SDLMixer::Stop()
 
     // Stop might be called multiple times, so we check whether the device is already closed
     if (Mix_QuerySpec(nullptr, nullptr, nullptr))
-    {
-        for (int i = 0; i != m_pHost->GetChannels(); ++i)
-        {
-            if (Mix_Playing(i))
-                Mix_HaltChannel(i);
-        }
-    }
+        if (Mix_Playing(0))
+            Mix_HaltChannel(0);
+
+#ifndef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
+    if (m_driverThread.joinable())
+        m_driverThread.join();
+#endif
 }
 
 void SDLMixer::Close()
 {
     Mix_CloseAudio();
 }
+
+#ifndef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
+void SDLMixer::DriverLoop()
+{
+    static std::vector<float> userData(m_pHost->GetBlockSampleCount() * m_pHost->GetChannels());
+
+    while (m_keepRunning)
+    {
+        GetFullOutputBlock(userData);
+        FillChunkBuffer(userData);
+
+        // busy-wait for the channel to finish
+        while (Mix_Playing(0)) {}
+        if (Mix_PlayChannel(0, &m_audioChunk, 0) == -1)
+            std::cerr << "Error while playing Chunk" << std::endl;
+    }
+}
+#endif
 }
 
 #endif // SOUNDWAVE_USING_SDLMIXER
+#line 225 "olc_swe_template.h"
+#line 7 "swe_system_alsa.cpp"
 #if defined(SOUNDWAVE_USING_ALSA)
 // ALSA Driver Implementation
 namespace olc::sound::driver
@@ -1876,6 +1949,8 @@ namespace olc::sound::driver
 	}
 } // ALSA Driver Implementation
 #endif
+#line 226 "olc_swe_template.h"
+#line 7 "swe_system_pulse.cpp"
 #if defined(SOUNDWAVE_USING_PULSE)
 // PULSE Driver Implementation
 #include <pulse/error.h>
@@ -1957,6 +2032,7 @@ namespace olc::sound::driver
 	}
 } // PulseAudio Driver Implementation
 #endif
+#line 227 "olc_swe_template.h"
 
 #endif // OLC_SOUNDWAVE IMPLEMENTATION
 #endif // OLC_SOUNDWAVE_H

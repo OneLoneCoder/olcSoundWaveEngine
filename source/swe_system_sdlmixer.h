@@ -10,6 +10,10 @@
 #include <SDL_mixer.h>
 #endif
 
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__) && !defined(SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD)
+#define SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
+#endif
+
 namespace olc::sound::driver
 {
     class SDLMixer final : public Base
@@ -25,17 +29,24 @@ namespace olc::sound::driver
         void Close() final;
 
     private:
-        void FillChunkBuffer(const std::vector<float>& userData) const;
+        void FillChunkBuffer(const std::vector<float>& userData);
 
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
         static void SDLMixerCallback(int channel);
+#else
+        void DriverLoop();
+#endif
 
     private:
-        bool m_keepRunning = false;
-        Uint16 m_haveFormat = AUDIO_F32SYS;
-        std::vector<Uint8> audioBuffer;
-        Mix_Chunk audioChunk;
-
+#ifdef SOUNDWAVE_USING_SDLMIXER_SINGLETHREAD
         static SDLMixer* instance;
+#else
+        std::thread m_driverThread{};
+#endif
+        Uint16 m_haveFormat = AUDIO_F32SYS;
+        std::vector<Uint8> m_audioBuffer{};
+        Mix_Chunk m_audioChunk{};
+        std::atomic<bool> m_keepRunning = false;
     };
 }
 

@@ -21,6 +21,7 @@ namespace olc::sound
 		bool bFinished = false;
 		bool bLoop = false;
 		bool bFlagForStop = false;
+		bool bPaused = false;
 	};
 
 	typedef std::list<WaveInstance>::iterator PlayingWave;
@@ -69,6 +70,9 @@ namespace olc::sound
 
 
 		PlayingWave PlayWaveform(Wave* pWave, bool bLoop = false, double dSpeed = 1.0);
+		void PauseWaveform(const PlayingWave& w);
+		void ResumeWaveform(const PlayingWave& w);
+		void RewindWaveform(const PlayingWave& w);
 		void StopWaveform(const PlayingWave& w);
 		void StopAll();
 

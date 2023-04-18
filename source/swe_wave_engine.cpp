@@ -112,6 +112,18 @@ namespace olc::sound
 		return std::prev(m_listWaves.end());
 	}
 
+	void WaveEngine::PauseWaveform(const PlayingWave& w) {
+		w->bPaused = true;
+	}
+
+	void WaveEngine::ResumeWaveform(const PlayingWave& w) {
+		w->bPaused = false;
+	}
+
+	void WaveEngine::RewindWaveform(const PlayingWave& w) {
+		w->dInstanceTime = m_dGlobalTime;
+	}
+
 	void WaveEngine::StopWaveform(const PlayingWave& w)
 	{
 		w->bFlagForStop = true;
@@ -173,8 +185,14 @@ namespace olc::sound
 						}
 						else
 						{
-							// OR, sample the waveform from the correct channel
-							fSample += float(wave.pWave->vChannelView[nChannel % wave.pWave->file.channels()].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
+							// OR, if waveform is not paused, then sample the waveform from the correct channel
+							if (!wave.bPaused) {
+								fSample += float(wave.pWave->vChannelView[nChannel % wave.pWave->file.channels()].GetSample(dTimeOffset * m_dSamplePerTime * wave.dSpeedModifier));
+							}
+							else {
+								// Account for paused waiting time.
+								wave.dInstanceTime += m_dTimePerSample;
+							}
 						}
 					}
 				}

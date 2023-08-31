@@ -130,6 +130,7 @@ namespace olc::sound::wave
 					{
 						int8_t s = 0;
 						ifs.read((char*)&s, sizeof(int8_t));
+						s = s - 128; //Correct value since 8-bit PCM is unsigned.
 						*pSample = T(s) / T(std::numeric_limits<int8_t>::max());
 					}
 					break;

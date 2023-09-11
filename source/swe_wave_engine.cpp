@@ -35,6 +35,11 @@ namespace olc::sound
 #if defined(SOUNDWAVE_USING_PULSE)
 		m_driver = std::make_unique<driver::PulseAudio>(this);
 #endif
+
+#if defined(SOUNDWAVE_USING_MINIAUDIO)
+		m_driver = std::make_unique<driver::MiniAudio>(this);
+#endif
+
 	}
 
 	WaveEngine::~WaveEngine()

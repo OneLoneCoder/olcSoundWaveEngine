@@ -3,11 +3,13 @@
 #include "swe_prefix.h"
 #include "swe_wave_wave.h"
 #include "swe_system_base.h"
-#include "swe_system_winmm.h"
-#include "swe_system_wasapi.h"
-#include "swe_system_openal.h"
 #include "swe_system_alsa.h"
+#include "swe_system_miniaudio.h"
+#include "swe_system_openal.h"
+#include "swe_system_pulse.h"
 #include "swe_system_sdlmixer.h"
+#include "swe_system_wasapi.h"
+#include "swe_system_winmm.h"
 
 namespace olc::sound
 {

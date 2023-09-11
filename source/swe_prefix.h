@@ -22,7 +22,7 @@
 #if !defined(SOUNDWAVE_USING_WINMM) && !defined(SOUNDWAVE_USING_WASAPI) &&  \
     !defined(SOUNDWAVE_USING_XAUDIO) && !defined(SOUNDWAVE_USING_OPENAL) && \
     !defined(SOUNDWAVE_USING_ALSA) && !defined(SOUNDWAVE_USING_SDLMIXER) && \
-    !defined(SOUNDWAVE_USING_PULSE)                                         \
+    !defined(SOUNDWAVE_USING_PULSE) && !defined(SOUNDWAVE_USING_MINIAUDIO)
 
 	#if defined(_WIN32)
 		#define SOUNDWAVE_USING_WINMM

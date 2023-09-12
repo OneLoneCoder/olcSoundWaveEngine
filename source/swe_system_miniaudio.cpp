@@ -81,7 +81,7 @@ namespace olc::sound::driver
 		MiniAudio* pMiniAudio = (MiniAudio*)pDevice->pUserData;
 		float* pOutputFloat = (float*)pOutput;
 
-		std::vector<float> vFloatBuffer(frameCount * pMiniAudio->m_pHost->GetChannels(), 0.0f);
+		std::vector<float> vFloatBuffer(pMiniAudio->m_pHost->GetBlockSampleCount() * pMiniAudio->m_pHost->GetChannels(), 0.0f);
 		pMiniAudio->GetFullOutputBlock(vFloatBuffer);
 
 		for(int i = 0; i < vFloatBuffer.size(); i++)

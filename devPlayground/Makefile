@@ -1,10 +1,10 @@
 
 
-.PHONY: all miniaudio-test-linux miniaudio-test-emscripten clean
+.PHONY: all linux emscripten clean
 
-all: miniaudio-test-linux miniaudio-test-emscripten
+all: linux emscripten
 
-miniaudio-test-linux:
+linux:
 	g++ ../source/swe_synth_envelope.cpp \
 		../source/swe_system_alsa.cpp \
 		../source/swe_system_openal.cpp \
@@ -26,7 +26,7 @@ miniaudio-test-linux:
 		-ldl -lm -lX11 -lGL -lpthread -lpng -lstdc++fs \
 		-std=c++17 -I../ -I../source -I../demos
 
-miniaudio-test-emscripten:
+emscripten:
 	em++ ../source/swe_synth_envelope.cpp \
 		../source/swe_system_alsa.cpp \
 		../source/swe_system_openal.cpp \

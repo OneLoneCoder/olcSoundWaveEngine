@@ -45,3 +45,7 @@ tools/headerify.exe
 build
 CMakeCache.txt
 CMakeFiles
+
+# devPlayground
+devPlayground/Test_MiniAudio*
+!devPlayground/Test_MiniAudio.cpp

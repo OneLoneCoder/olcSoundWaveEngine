@@ -26,7 +26,6 @@ namespace olc::sound::driver
         
     private:
         ma_device* m_pDevice = nullptr;
-        ma_data_converter*   m_pDataConverter = nullptr;
 
     };
 }

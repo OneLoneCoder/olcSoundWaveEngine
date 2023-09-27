@@ -21,7 +21,6 @@ namespace olc::sound::driver
 		Stop();
 		Close();
 		delete m_pDevice;
-		delete m_pDataConverter;
 	}
 
 	bool MiniAudio::Open(const std::string& sOutputDevice, const std::string& sInputDevice)
@@ -29,9 +28,6 @@ namespace olc::sound::driver
 		if(m_pDevice == nullptr)
 			m_pDevice = new ma_device();
 		
-		if(m_pDataConverter == nullptr);
-			m_pDataConverter = new ma_data_converter();
-
 		ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 		
 		deviceConfig.playback.format   = ma_format_f32;
@@ -44,18 +40,6 @@ namespace olc::sound::driver
 		if (ma_device_init(NULL, &deviceConfig, m_pDevice) != MA_SUCCESS)
 			return false;  // Failed to initialize the device.
 		
-		ma_data_converter_config dataConverterConfig = ma_data_converter_config_init(
-			ma_format_f32,
-			ma_format_f32,
-			m_pHost->GetChannels(),
-			m_pHost->GetChannels(),
-			m_pHost->GetSampleRate(),
-			m_pHost->GetSampleRate()
-		);
-
-		if (ma_data_converter_init(&dataConverterConfig, NULL, m_pDataConverter) != MA_SUCCESS)
-			return false; // failed to create converter
-
 		return true;
 	}
 
@@ -72,7 +56,6 @@ namespace olc::sound::driver
 
 	void MiniAudio::Close()
 	{
-		ma_data_converter_uninit(m_pDataConverter, NULL);
 		ma_device_uninit(m_pDevice);
 	}
 	

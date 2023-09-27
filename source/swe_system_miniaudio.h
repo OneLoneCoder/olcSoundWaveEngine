@@ -22,7 +22,6 @@ namespace olc::sound::driver
     
     public:
         static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
-        uint32_t FillOutputBuffer(std::vector<float>& vBuffer, const uint32_t nBufferOffset, const uint32_t nRequiredSamples);
         
     private:
         ma_device* m_pDevice = nullptr;

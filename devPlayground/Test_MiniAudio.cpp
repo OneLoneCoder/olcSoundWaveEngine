@@ -42,6 +42,10 @@ public:
 		// Chromium is notorious for having issues with the audio buffer size and stuttering.
 		// From some quick experimenting, anecdotal, I found audio stabilized in Chromium by
 		// doubling the buffer. This will need adjusting if sample rate changes, etc...
+		// 
+		// For 44100, a buffer of size 1024 is ~23ms of buffer
+
+		// (44100 / 1000) * 23 = 1014.3, i rounded up to 1024 because it's an easy to remember number.
 		#if defined(__EMSCRIPTEN__)
 		engine.InitialiseAudio(44100, 1, 8, 1024);
 		#else

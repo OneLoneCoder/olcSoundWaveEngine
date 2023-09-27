@@ -38,7 +38,16 @@ public:
 	{
 		sample_44100.LoadAudioWaveform("../demos/assets/Sample_Test_44100.wav");
 		sample_48000.LoadAudioWaveform("../demos/assets/Sample_Test_48000.wav");
-		engine.InitialiseAudio(44100);
+		
+		// Chromium is notorious for having issues with the audio buffer size and stuttering.
+		// From some quick experimenting, anecdotal, I found audio stabilized in Chromium by
+		// doubling the buffer. This will need adjusting if sample rate changes, etc...
+		#if defined(__EMSCRIPTEN__)
+		engine.InitialiseAudio(44100, 1, 8, 1024);
+		#else
+		engine.InitialiseAudio();
+		#endif
+		
 		return true;
 	}
 
